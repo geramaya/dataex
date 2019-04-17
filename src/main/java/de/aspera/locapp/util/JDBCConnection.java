@@ -31,12 +31,12 @@ public class JDBCConnection {
 	 * stored in MySQL.
 	 * 
 	 */
-	public static void truncate(String url_database, String username, String password) throws SQLException, IOException {
+	public static void truncate(String urlDatabase, String username, String password) throws SQLException, IOException {
 
 		logger.info("truncate()");
 		Connection conn = null;
 		try {
-			conn = DriverManager.getConnection(url_database, username, password);
+			conn = DriverManager.getConnection(urlDatabase, username, password);
 
 			String querry = "{call " + procedureName + "()}";
 			CallableStatement cStmt = conn.prepareCall(querry);
