@@ -23,7 +23,7 @@ public class Resources {
     private static Resources resources;
     private static Properties systemProperties;
     private static final Logger LOGGER = Logger.getLogger(Resources.class.getName());
-    public final static String PROJECT_NAME = "locapp";
+    public final static String PROJECT_NAME = "dataexporter";
 
     /**
      * Privater leerer Standardkonstruktor.
