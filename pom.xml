@@ -2,8 +2,8 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>de.aspera</groupId>
-    <artifactId>locapp</artifactId>
-    <version>1.2.0-RELEASE</version>
+    <artifactId>dataexporter</artifactId>
+    <version>0.0.1</version>
     <packaging>jar</packaging>
     <properties>
         <jre.compiler.version>1.8</jre.compiler.version>

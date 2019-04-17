@@ -67,11 +67,7 @@ public class CommandContext {
         addCommand("q", QuitCommand.class);
         addCommand("h", HelpCommand.class);
         addCommand("help", HelpCommand.class);
-        addCommand("clear-loc", ClearLocalizationCommand.class);
-        addCommand("cl", ClearLocalizationCommand.class);
         addCommand("init", ConfigInitCommand.class);
         addCommand("i", ConfigInitCommand.class);
-        addCommand("ci", CheckIntegrityCommand.class);
-        addCommand("check-integrity", CheckIntegrityCommand.class);
     }
 }
