@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.core.dbsupport.DbSupportFactory;
 import org.unitils.core.dbsupport.SQLHandler;
+import org.unitils.database.DatabaseUnitils;
 import org.unitils.dbunit.util.DbUnitDatabaseConnection;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
@@ -45,17 +46,17 @@ public class DbUnitModule extends org.unitils.dbunit.DbUnitModule {
      *            The sql handler, not null
      * @return The dbms specific instance of {@link DbSupport}, not null
      */
-    public static DbSupport getDefaultDbSupport(Properties configuration, SQLHandler sqlHandler) {
+    public DbSupport getDefaultDbSupport(Properties configuration, SQLHandler sqlHandler) {
         String defaultSchemaName = null;
 
         try {
             defaultSchemaName = getStringList(DbSupportFactory.PROPKEY_DATABASE_SCHEMA_NAMES, configuration, true).get(
                     0);
         } catch (Exception x) {
-
+        	
         }
-
-        return DbSupportFactory.getDbSupport(configuration, sqlHandler, defaultSchemaName);
+         
+        return DbSupportFactory.getDbSupport(configuration, sqlHandler, defaultSchemaName, getDefaultDbSupport().getDatabaseDialect());
     }
 
     /**
@@ -220,6 +221,7 @@ public class DbUnitModule extends org.unitils.dbunit.DbUnitModule {
      * @throws SQLException
      */
     protected Connection getConnection() throws SQLException {
+    	getDefaultDbSupport().getDatabaseDialect();
         return getDbUnitDatabaseConnection(getDefaultDbSupport().getSchemaName()).getConnection();
     }
 
@@ -268,6 +270,7 @@ public class DbUnitModule extends org.unitils.dbunit.DbUnitModule {
 
         // DataSource dataSource = getDatabaseModule().activateTransactionIfNeeded();
         getDatabaseModule().activateTransactionIfNeeded();
+        DataSource dataSource = DatabaseUnitils.getDataSource();
 
         DatabaseConfig config = connection.getConfig();
 
