@@ -17,7 +17,7 @@ public class DataSetExporterTest extends BasicFacadeTest{
 	DataSetExporter exporter;
 	@Before
 	public void createObjects() {
-		File resourcesDirectory = new File("src/main/resources/testFiles");
+		File resourcesDirectory = new File("src/main/resources");
 		path= resourcesDirectory.getAbsolutePath();
 		testMethod = "DataSetExporterTest";
 		tableDescriptor = new TableDescriptor("employee");
