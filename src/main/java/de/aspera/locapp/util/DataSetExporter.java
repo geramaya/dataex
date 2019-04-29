@@ -3,14 +3,17 @@ package de.aspera.locapp.util;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
 
+import org.dbunit.DatabaseUnitException;
 import org.dbunit.database.AmbiguousTableNameException;
 import org.dbunit.database.IDatabaseConnection;
 import org.dbunit.dataset.DataSetException;
 import org.dbunit.dataset.xml.FlatXmlDataSet;
+import org.dbunit.ext.mysql.MySqlConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.unitils.core.Unitils;
 
 
 
@@ -27,15 +30,17 @@ import org.unitils.core.Unitils;
 public class DataSetExporter {
 
     private static final Logger logger   = LoggerFactory.getLogger(DataSetExporter.class);
+    private Connection connection = JDBCConnection.getConnection("jdbc:mysql://127.0.0.1:3306/slc_dev", "root", "root");
+    private String DbUrl= "jdbc:mysql://127.0.0.1:3306/slc_dev";
 
     public final static DataSetExporter   INSTANCE = new DataSetExporter();
 
-    public void exportDataSet(String path, Class<?> callerClass, String testMethod, TableDescriptor... descriptors) {
+    public void exportDataSet(String path, Class<?> callerClass, String testMethod, TableDescriptor... descriptors) throws DatabaseUnitException, SQLException {
         exportDataSetInternal(this.generateDataSetFileName(path, callerClass, testMethod), descriptors);
     }
 
     public void exportExpectedDataSet(String path, Class<?> callerClass, String testMethod,
-            TableDescriptor... descriptors) {
+            TableDescriptor... descriptors) throws DatabaseUnitException, SQLException {
         exportDataSetInternal(this.generateExpectedDataSetFileName(path, callerClass, testMethod), descriptors);
     }
 
@@ -63,25 +68,38 @@ public class DataSetExporter {
         return generatedFileName;
     }
 
-    private IDatabaseConnection connection;
+    
 
     /** 
      * Reuse the connection where possible.
      * 
      */
-    public IDatabaseConnection getConnection() {
+    public Connection getConnection() {
+    	
         return connection;
     }
+    /**
+     * 
+     * @param Url
+     * @param username
+     * @param password
+     * @return
+     */
+	public void setConnection(String Url, String username, String password) {
+		DbUrl = Url;
+		connection= JDBCConnection.getConnection(Url, username, password);
+	}
 
-    protected void exportDataSetInternal(String dataSetFileName, TableDescriptor... descriptors) {
+    protected void exportDataSetInternal(String dataSetFileName, TableDescriptor... descriptors) throws DatabaseUnitException, SQLException {
 
-        IDatabaseConnection connection = this.getConnection();
-
-        DbUnitModule dbUnitModule = Unitils.getInstance().getModulesRepository().getModuleOfType(DbUnitModule.class);
-        String schemaName = dbUnitModule.getDefaultSchemaName();
-
+    	
+// NO Need for the dbUtil because there will be no Property File read
+//        DbUnitModule dbUnitModule = Unitils.getInstance().getModulesRepository().getModuleOfType(DbUnitModule.class);
+//        String schemaName = dbUnitModule.getDefaultSchemaName();
+    	String schemaName = DbUrl.substring(DbUrl.lastIndexOf("/")+1);
+        IDatabaseConnection conn = new MySqlConnection(connection, schemaName);
         // partial database export
-        QueryDataSet partialDataSet = new QueryDataSet(connection, schemaName);
+        QueryDataSet partialDataSet = new QueryDataSet(conn, schemaName);
         try {
 
             int length = descriptors.length;
