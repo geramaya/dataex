@@ -14,6 +14,7 @@ import org.dbunit.dataset.xml.FlatXmlDataSet;
 import org.dbunit.ext.mysql.MySqlConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.unitils.core.Unitils;
 
 
 
@@ -30,13 +31,12 @@ import org.slf4j.LoggerFactory;
 public class DataSetExporter {
 
     private static final Logger logger   = LoggerFactory.getLogger(DataSetExporter.class);
-    private Connection connection = JDBCConnection.getConnection("jdbc:mysql://127.0.0.1:3306/slc_dev", "root", "root");
-    private String DbUrl= "jdbc:mysql://127.0.0.1:3306/slc_dev";
-
+    private Connection connection ;
+	private String schemaName;
     public final static DataSetExporter   INSTANCE = new DataSetExporter();
 
-    public void exportDataSet(String path, Class<?> callerClass, String testMethod, TableDescriptor... descriptors) throws DatabaseUnitException, SQLException {
-        exportDataSetInternal(this.generateDataSetFileName(path, callerClass, testMethod), descriptors);
+    public void exportDataSet(String path, String fileName, TableDescriptor... descriptors) throws DatabaseUnitException, SQLException {
+        exportDataSetInternal(this.generateDataSetFileName(path, fileName), descriptors);
     }
 
     public void exportExpectedDataSet(String path, Class<?> callerClass, String testMethod,
@@ -44,11 +44,10 @@ public class DataSetExporter {
         exportDataSetInternal(this.generateExpectedDataSetFileName(path, callerClass, testMethod), descriptors);
     }
 
-    protected String generateDataSetFileName(String path, Class<?> callerClass, String testMethod) {
+    protected String generateDataSetFileName(String path, String fileName) {
         StringBuilder builder = new StringBuilder();
 
-        builder.append(path).append("/").append(callerClass.getSimpleName()).append(".").append(testMethod)
-                .append(".xml.sample");
+        builder.append(path).append("/").append(fileName+".xml.sample");
 
         String generatedFileName = builder.toString();
 
@@ -85,18 +84,15 @@ public class DataSetExporter {
      * @param password
      * @return
      */
-	public void setConnection(String Url, String username, String password) {
-		DbUrl = Url;
-		connection= JDBCConnection.getConnection(Url, username, password);
+	public void setConnection(Connection connection) {
+		this.connection= connection;
+	}
+	
+	public void setSchemaName(String schemaName) {
+		this.schemaName=schemaName;
 	}
 
-    protected void exportDataSetInternal(String dataSetFileName, TableDescriptor... descriptors) throws DatabaseUnitException, SQLException {
-
-    	
-// NO Need for the dbUtil because there will be no Property File read
-//        DbUnitModule dbUnitModule = Unitils.getInstance().getModulesRepository().getModuleOfType(DbUnitModule.class);
-//        String schemaName = dbUnitModule.getDefaultSchemaName();
-    	String schemaName = DbUrl.substring(DbUrl.lastIndexOf("/")+1);
+    protected void exportDataSetInternal(String dataSetFileName, TableDescriptor... descriptors) throws DatabaseUnitException, SQLException {    	
         IDatabaseConnection conn = new MySqlConnection(connection, schemaName);
         // partial database export
         QueryDataSet partialDataSet = new QueryDataSet(conn, schemaName);
