@@ -30,7 +30,7 @@ public class DataSetExporterTest extends BasicFacadeTest{
 	@Test
 	public void exportDatasetTest() throws DatabaseUnitException, SQLException, IOException {
 		exporter.makeConnection(connectionData);
-		resultStream = exporter.startExport("sap_system", null, null);
+		resultStream = exporter.startExportForTable("sap_system","*", null, null);
 		assertNotNull("Did not create output stream!", resultStream );
 		String content = resultStream.toString();
 		assertTrue("Did not export the right table!", content.contains("sap_system"));

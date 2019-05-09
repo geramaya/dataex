@@ -13,13 +13,13 @@ public class ExporterController {
 		this.dataConn=dataconn;
 		exporter.setConnection(JDBCConnection.getConnection(dataconn.getDatabaseUrl(), dataconn.getUsername(), dataconn.getPassword()));
 	}
-	public ByteArrayOutputStream startExport(String tableName, String whereClause,String orderByClause ) throws DatabaseUnitException, SQLException {
+	public ByteArrayOutputStream startExportForTable(String tableName,String columnsComaSeperated, String whereClause,String orderByClause ) throws DatabaseUnitException, SQLException {
 		String schemaName = dataConn.getDatabaseUrl().substring(dataConn.getDatabaseUrl().lastIndexOf("/")+1);
 		TableDescriptor discriptor = new TableDescriptor(tableName);
 		discriptor.setOrderByClause(orderByClause);
 		discriptor.setWhereClause(whereClause);
 		discriptor.setSchemaName(schemaName);
-		discriptor.addField("*");
+		discriptor.addField(columnsComaSeperated);
 		return exporter.exportDataSet( discriptor);
 	}
 
