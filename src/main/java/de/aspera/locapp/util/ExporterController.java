@@ -6,21 +6,39 @@ import java.sql.SQLException;
 import org.dbunit.DatabaseUnitException;
 
 public class ExporterController {
-	private DataSetExporter exporter = new DataSetExporter();
-	private DataConnection dataConn;
-	
-	public void makeConnection(DataConnection dataconn) {
-		this.dataConn=dataconn;
-		exporter.setConnection(JDBCConnection.getConnection(dataconn.getDatabaseUrl(), dataconn.getUsername(), dataconn.getPassword()));
-	}
-	public ByteArrayOutputStream startExportForTable(String tableName,String columnsComaSeperated, String whereClause,String orderByClause ) throws DatabaseUnitException, SQLException {
-		String schemaName = dataConn.getDatabaseUrl().substring(dataConn.getDatabaseUrl().lastIndexOf("/")+1);
+
+	/**
+	 * Get a buffered output stream to transform data or persist on the filesystem.
+	 * 
+	 * @param tableName
+	 * @param columnsComaSeperated e.g. "firstname, lastname, ...." or "*" for all columns
+	 * @param whereClause
+	 * @param orderByClause
+	 * @return
+	 * @throws DatabaseUnitException
+	 * @throws SQLException
+	 */
+	public static ByteArrayOutputStream startExportForTable(DataConnection databaseConnection, String tableName,
+			String columnsComaSeperated, String whereClause, String orderByClause)
+			throws DatabaseUnitException, SQLException {
+		
+		if (databaseConnection == null)
+			throw new IllegalArgumentException("The databaseConnection can not be null");
+		
+		if (tableName == null || columnsComaSeperated == null) 
+			throw new IllegalArgumentException("The tableName and columns definition are required for an export!");
+		
+		
+		DataSetExporter exporter = new DataSetExporter(databaseConnection);
+		String schemaName = databaseConnection.getDatabaseUrl()
+				.substring(databaseConnection.getDatabaseUrl().lastIndexOf("/") + 1);
 		TableDescriptor discriptor = new TableDescriptor(tableName);
 		discriptor.setOrderByClause(orderByClause);
 		discriptor.setWhereClause(whereClause);
 		discriptor.setSchemaName(schemaName);
 		discriptor.addField(columnsComaSeperated);
-		return exporter.exportDataSet( discriptor);
+		return exporter.exportDataSet(discriptor);
 	}
+
 
 }

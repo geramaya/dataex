@@ -1,7 +1,6 @@
 # Dataexporter
 
-The application LocApp is a command line interface (CLI) application. LocApp recursively collects
-all available * .properties files from a root directory and imports the path and value information into an h2 database.
+The application DatasetExporter .... [describe me!]
 
 ###  List of commands:
 
