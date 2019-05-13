@@ -12,6 +12,7 @@ import org.junit.Test;
 
 import de.aspera.locapp.util.DataConnection;
 import de.aspera.locapp.util.ExporterController;
+import de.aspera.locapp.util.json.JsonDatabase;
 
 public class DataSetExporterTest extends BasicFacadeTest {
 	
@@ -19,10 +20,10 @@ public class DataSetExporterTest extends BasicFacadeTest {
 	
 	@Test
 	public void exportDatasetTest() throws DatabaseUnitException, SQLException, IOException {
-		DataConnection connectionData = new DataConnection();
-		connectionData.setDatabaseUrl("jdbc:mysql://127.0.0.1:3306/slc_test");
-		connectionData.setUsername("user");
-		connectionData.setPassword("password");
+		JsonDatabase connectionData = new JsonDatabase();
+		connectionData.setDbUrl("jdbc:mysql://127.0.0.1:3306/slc_test");
+		connectionData.setDbUser("user");
+		connectionData.setDbPassword("password");
 
 		ByteArrayOutputStream resultStream = ExporterController.startExportForTable(connectionData, "sap_system", "*", null, null);
 		assertNotNull("Did not create output stream!", resultStream);

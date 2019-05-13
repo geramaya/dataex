@@ -14,6 +14,8 @@ import org.dbunit.ext.mysql.MySqlConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.aspera.locapp.util.json.JsonDatabase;
+
 /**
  * Use this to export data from database to a flat XML data set..
  * @author Petr Stastny
@@ -24,7 +26,7 @@ public class DataSetExporter {
 	private static final Logger logger = LoggerFactory.getLogger(DataSetExporter.class);
 	private Connection connection;
 
-	public DataSetExporter(DataConnection databaseConnection) {
+	public DataSetExporter(JsonDatabase databaseConnection) {
 		this.connection = getConnection(databaseConnection);
 	}
 
@@ -67,9 +69,9 @@ public class DataSetExporter {
 	 * @param databaseConnection
 	 * @return
 	 */
-	private Connection getConnection(DataConnection databaseConnection) {
-		return JDBCConnection.getConnection(databaseConnection.getDatabaseUrl(), databaseConnection.getUsername(),
-				databaseConnection.getPassword());
+	private Connection getConnection(JsonDatabase databaseConnection) {
+		return JDBCConnection.getConnection(databaseConnection.getDbUrl(), databaseConnection.getDbUser(),
+				databaseConnection.getDbPassword());
 	}
 
 	/**

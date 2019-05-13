@@ -5,6 +5,8 @@ import java.sql.SQLException;
 
 import org.dbunit.DatabaseUnitException;
 
+import de.aspera.locapp.util.json.JsonDatabase;
+
 public class ExporterController {
 
 	/**
@@ -18,7 +20,7 @@ public class ExporterController {
 	 * @throws DatabaseUnitException
 	 * @throws SQLException
 	 */
-	public static ByteArrayOutputStream startExportForTable(DataConnection databaseConnection, String tableName,
+	public static ByteArrayOutputStream startExportForTable(JsonDatabase databaseConnection, String tableName,
 			String columnsComaSeperated, String whereClause, String orderByClause)
 			throws DatabaseUnitException, SQLException {
 		
@@ -30,8 +32,8 @@ public class ExporterController {
 		
 		
 		DataSetExporter exporter = new DataSetExporter(databaseConnection);
-		String schemaName = databaseConnection.getDatabaseUrl()
-				.substring(databaseConnection.getDatabaseUrl().lastIndexOf("/") + 1);
+		String schemaName = databaseConnection.getDbUrl()
+				.substring(databaseConnection.getDbUrl().lastIndexOf("/") + 1);
 		TableDescriptor discriptor = new TableDescriptor(tableName);
 		discriptor.setOrderByClause(orderByClause);
 		discriptor.setWhereClause(whereClause);
