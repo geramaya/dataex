@@ -7,22 +7,28 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.SystemUtils;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.stream.JsonReader;
 
 public class JsonConnectionRepo {
 	private static JsonConnectionRepo instance;
-	public final static String PROJECT_NAME = "dataexporter";
+	public final static String PROJECT_NAME = "dataExporter";
 	private Map<String, JsonDatabase> dbConnections = new HashMap<>();
 	private static final Logger logger = Logger.getLogger(JsonConnectionRepo.class.getName());
+	private Gson gson = new Gson();
+	private List <JsonDatabase> jsonDatabases;
 
 	private JsonConnectionRepo() {
 
@@ -44,8 +50,12 @@ public class JsonConnectionRepo {
 	}
 
 	public void initJsonDatabases() {
+		
 		JsonParser jsonParser = new JsonParser();
-		try (FileReader reader = new FileReader(getJasonFileConn())) {
+		try {
+			JsonReader reader = new JsonReader(new FileReader(getJasonFileConn()));
+			reader.setLenient(true);
+//					FileUtils.readFileToString(getJasonFileConn());
 			Object obj = jsonParser.parse(reader);
 			JsonArray jsonConnectionArr = (JsonArray) obj;
 			for (JsonElement element : jsonConnectionArr) {
@@ -61,36 +71,22 @@ public class JsonConnectionRepo {
 	}
 
 	public void parseJsonConnection(JsonElement element) throws JsonConnectionReadException {
-		String ident;
-		String dbDriver;
-		String dbUrl;
-		String dbUser;
-		String dbPassword;
+		Gson gson = new Gson();
 		JsonObject jsonObj = (JsonObject) element;
 		JsonObject connectionObj = (JsonObject) jsonObj.get("Connection");
-		ident = connectionObj.get("ID").getAsString();
-		dbDriver = connectionObj.get("Driver").getAsString();
-		dbUrl = connectionObj.get("URL").getAsString();
-		dbUser = connectionObj.get("Username").getAsString();
-		dbPassword = connectionObj.get("Password").getAsString();
-		if (ident.isEmpty()) {
+		JsonDatabase dbConn = gson.fromJson(connectionObj.toString(), JsonDatabase.class);
+		if (dbConn.getIdent().isEmpty()) {
 			throw new NoIdDefinedException("Id field is empty");
-		}
-		if (dbUrl.contains("sqlserver") && dbDriver.isEmpty()) {
-			throw new NoDriverDefinedException("Driver must be defined for MSSQL");
-		}
-		if (dbUser.isEmpty() || dbPassword.isEmpty()) {
-			throw new NotValidUserDataException("Username or Password are not defined for the Connection: " + ident);
-		}
-		JsonDatabase connectionData = new JsonDatabase();
-		connectionData.setDbDriver(dbDriver);
-		connectionData.setDbPassword(dbPassword);
-		connectionData.setDbUrl(dbUrl);
-		connectionData.setDbUser(dbUser);
-		connectionData.setIdent(ident);
-		JsonDatabase insetrtedDBConn = dbConnections.put(ident, connectionData);
-		if (insetrtedDBConn != null)
+		} else if (dbConnections.keySet().contains(dbConn.getIdent())) {
 			throw new DuplicateConnIdException("connection Id already exists");
+		} else if (dbConn.getDbUrl().contains("sqlserver") && dbConn.getDbDriver().isEmpty()) {
+			throw new NoDriverDefinedException("Driver must be defined for MSSQL");
+		} else if (dbConn.getDbUser().isEmpty() || dbConn.getDbPassword().isEmpty()) {
+			throw new NotValidUserDataException(
+					"Username or Password are not defined for the Connection: " + dbConn.getIdent());
+		} else {
+			dbConnections.put(dbConn.getIdent(), dbConn);
+		}
 	}
 
 	public Map<String, JsonDatabase> getAllJsonDatabases() {
@@ -110,5 +106,8 @@ public class JsonConnectionRepo {
 		}
 		Path pathOfFile = Paths.get(filePath);
 		return pathOfFile.toFile();
+	}
+	public void deleteConnections() {
+		dbConnections.clear();
 	}
 }

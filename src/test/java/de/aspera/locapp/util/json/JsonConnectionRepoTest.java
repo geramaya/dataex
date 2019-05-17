@@ -18,18 +18,19 @@ public class JsonConnectionRepoTest {
 		String URL = "jdbc:mysql://127.0.0.1/slc_test";
 		String Username = "root";
 		String pass = "pass";
-		connectionDetails.addProperty("ID", ID);
-		connectionDetails.addProperty("Driver", Driver);
-		connectionDetails.addProperty("URL", URL);
-		connectionDetails.addProperty("Username", Username);
-		connectionDetails.addProperty("Password", pass);
+		connectionDetails.addProperty("ident", ID);
+		connectionDetails.addProperty("dbDriver", Driver);
+		connectionDetails.addProperty("dbUrl", URL);
+		connectionDetails.addProperty("dbUser", Username);
+		connectionDetails.addProperty("dbPassword", pass);
 	}
 
 	@Test(expected = NoDriverDefinedException.class)
 	public void testReadJsonDbValuesThrowDriverException() throws JsonConnectionReadException {
 		JsonConnectionRepo connectionRepo = JsonConnectionRepo.getInstance();
-		connectionDetails.addProperty("URL", "jdbc:jtds:sqlserver://192.168.111.150:1433/slc_dev");
-		connectionDetails.addProperty("Driver", "");
+		connectionRepo.deleteConnections();
+		connectionDetails.addProperty("dbUrl", "jdbc:jtds:sqlserver://192.168.111.150:1433/slc_dev");
+		connectionDetails.addProperty("dbDriver", "");
 		JsonObject connection = new JsonObject();
 		connection.add("Connection", connectionDetails);
 		connectionRepo.parseJsonConnection(connection);
@@ -39,7 +40,8 @@ public class JsonConnectionRepoTest {
 	@Test(expected = NoIdDefinedException.class)
 	public void testReadJsonDbValuesThrowIdException() throws JsonConnectionReadException {
 		JsonConnectionRepo connectionRepo = JsonConnectionRepo.getInstance();
-		connectionDetails.addProperty("ID", "");
+		connectionRepo.deleteConnections();
+		connectionDetails.addProperty("ident", "");
 		JsonObject connection = new JsonObject();
 		connection.add("Connection", connectionDetails);
 		connectionRepo.parseJsonConnection(connection);
@@ -53,6 +55,7 @@ public class JsonConnectionRepoTest {
 		JsonObject connectionTwo = new JsonObject();
 		connectionTwo.add("Connection", connectionDetails);
 		JsonConnectionRepo connectionRepo = JsonConnectionRepo.getInstance();
+		connectionRepo.deleteConnections();
 		connectionRepo.parseJsonConnection(connectionOne);
 		connectionRepo.parseJsonConnection(connectionTwo);
 	}
@@ -62,7 +65,7 @@ public class JsonConnectionRepoTest {
 		JsonConnectionRepo connectionRepo = JsonConnectionRepo.getInstance();
 		for (int i = 0; i < 6; i++) {
 			JsonObject conn = new JsonObject();
-			connectionDetails.addProperty("ID", "ID-" + i);
+			connectionDetails.addProperty("ident", "ID-" + i);
 			conn.add("Connection", connectionDetails);
 			connectionRepo.parseJsonConnection(conn);
 		}

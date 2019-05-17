@@ -5,6 +5,8 @@ import java.sql.SQLException;
 
 import org.dbunit.DatabaseUnitException;
 
+import de.aspera.locapp.util.json.JsonConnectionReadException;
+import de.aspera.locapp.util.json.JsonConnectionRepo;
 import de.aspera.locapp.util.json.JsonDatabase;
 
 public class ExporterController {
@@ -40,6 +42,9 @@ public class ExporterController {
 		discriptor.setSchemaName(schemaName);
 		discriptor.addField(columnsComaSeperated);
 		return exporter.exportDataSet(discriptor);
+	}
+	public static void readJsonDatabaseFile() throws JsonConnectionReadException {
+		JsonConnectionRepo.getInstance().initJsonDatabases();
 	}
 
 
