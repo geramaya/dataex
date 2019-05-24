@@ -3,7 +3,7 @@ package de.aspera.locapp.util.json;
 public class ExportJsonCommand {
 	private String commandId;
 	private String connId;
-	private String table;
+	private String tableName;
 	private String columns;
 	private String whereClause;
 	private String orderByClause;
@@ -25,12 +25,12 @@ public class ExportJsonCommand {
 		this.connId = connId;
 	}
 
-	public String getTable() {
-		return table;
+	public String getTableName() {
+		return tableName;
 	}
 
-	public void setTable(String table) {
-		this.table = table;
+	public void setTableName(String table) {
+		this.tableName = table;
 	}
 
 	public String getColumns() {

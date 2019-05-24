@@ -7,12 +7,10 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.SystemUtils;
 
 import com.google.gson.Gson;
@@ -27,8 +25,6 @@ public class JsonConnectionRepo {
 	public final static String PROJECT_NAME = "dataExporter";
 	private Map<String, JsonDatabase> dbConnections = new HashMap<>();
 	private static final Logger logger = Logger.getLogger(JsonConnectionRepo.class.getName());
-	private Gson gson = new Gson();
-	private List <JsonDatabase> jsonDatabases;
 
 	private JsonConnectionRepo() {
 
@@ -50,20 +46,17 @@ public class JsonConnectionRepo {
 	}
 
 	public void initJsonDatabases() {
-		
+		dbConnections = new HashMap<>();
 		JsonParser jsonParser = new JsonParser();
 		try {
 			JsonReader reader = new JsonReader(new FileReader(getJasonFileConn()));
 			reader.setLenient(true);
-//					FileUtils.readFileToString(getJasonFileConn());
 			Object obj = jsonParser.parse(reader);
 			JsonArray jsonConnectionArr = (JsonArray) obj;
 			for (JsonElement element : jsonConnectionArr) {
 				parseJsonConnection(element);
 			}
 		} catch (FileNotFoundException e) {
-			logger.log(Level.SEVERE, e.getMessage(), e);
-		} catch (IOException e) {
 			logger.log(Level.SEVERE, e.getMessage(), e);
 		} catch (JsonConnectionReadException e) {
 			logger.log(Level.SEVERE, e.getMessage(), e);
@@ -107,7 +100,9 @@ public class JsonConnectionRepo {
 		Path pathOfFile = Paths.get(filePath);
 		return pathOfFile.toFile();
 	}
+
 	public void deleteConnections() {
 		dbConnections.clear();
 	}
+
 }

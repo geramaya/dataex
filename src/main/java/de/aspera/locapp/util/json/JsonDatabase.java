@@ -55,15 +55,9 @@ public class JsonDatabase {
 		this.dbPassword = dbPassword;
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		// TODO implement apache common equalbuilder
-		return super.equals(obj);
+	public String getSchemaName() {
+		int index = dbUrl.lastIndexOf("/");
+		return this.dbUrl.substring(index + 1);
 	}
 
-	@Override
-	public int hashCode() {
-		// TODO implement apache common hashbuilder
-		return super.hashCode();
-	}
 }
