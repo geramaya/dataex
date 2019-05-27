@@ -10,8 +10,8 @@ import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.result.ResultIterable;
 import org.junit.Test;
 
-import de.aspera.locapp.dao.DatabaseException;
-import de.aspera.locapp.util.JDBCConnection;
+import de.aspera.dataexport.dao.DatabaseException;
+import de.aspera.dataexport.util.JDBCConnection;
 
 /**
  * 
