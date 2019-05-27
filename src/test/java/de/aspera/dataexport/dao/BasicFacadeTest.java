@@ -3,6 +3,9 @@ package de.aspera.dataexport.dao;
 
 import java.util.logging.Logger;
 
+import org.junit.runner.RunWith;
+import org.unitils.UnitilsJUnit4TestClassRunner;
+
 import de.aspera.dataexport.cmd.CommandContext;
 import de.aspera.dataexport.util.Resources;
 
@@ -11,6 +14,7 @@ import de.aspera.dataexport.util.Resources;
  *
  * @author daniel
  */
+@RunWith(UnitilsJUnit4TestClassRunner.class)
 public abstract class BasicFacadeTest {
     static {
         Resources.getInstance();

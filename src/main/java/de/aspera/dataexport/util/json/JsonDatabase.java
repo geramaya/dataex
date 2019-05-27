@@ -14,6 +14,7 @@ public class JsonDatabase {
 	private String dbUrl;
 	private String dbUser;
 	private String dbPassword;
+	private String dbSchema;
 
 	public String getIdent() {
 		return ident;
@@ -55,9 +56,12 @@ public class JsonDatabase {
 		this.dbPassword = dbPassword;
 	}
 
-	public String getSchemaName() {
-		int index = dbUrl.lastIndexOf("/");
-		return this.dbUrl.substring(index + 1);
+	public String getDbSchema() {
+		return dbSchema;
+	}
+
+	public void setDbSchema(String dbSchema) {
+		this.dbSchema = dbSchema;
 	}
 
 }

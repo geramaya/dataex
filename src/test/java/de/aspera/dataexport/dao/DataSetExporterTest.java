@@ -5,10 +5,17 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.logging.Logger;
 
 import org.dbunit.DatabaseUnitException;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.unitils.dbunit.annotation.DataSet;
 
 import de.aspera.dataexport.util.ExporterController;
 import de.aspera.dataexport.util.json.ExportJsonCommand;
@@ -16,28 +23,50 @@ import de.aspera.dataexport.util.json.JsonDatabase;
 
 public class DataSetExporterTest extends BasicFacadeTest {
 	
-	// TODO: Use unitils to load a dataset for using this with the current junit test.
-	
+	protected final static Logger logger = Logger.getLogger(DataSetExporterTest.class.getName());
+
+	@BeforeClass
+	public static void initDb() {
+		try {
+			Connection conn = DriverManager.getConnection("jdbc:h2:~/test;INIT=CREATE SCHEMA IF NOT EXISTS TESTX", "sa", "");
+			Statement st = conn.createStatement();
+			st.execute("SET SCHEMA TESTX");
+			st.execute("DROP TABLE IF EXISTS `customer`");
+			st.execute("create table customer(id integer, name varchar(10))");
+			st.execute("insert into customer values (1, 'Thomas')");
+			Statement stmt = conn.createStatement();
+			ResultSet rset = stmt.executeQuery("select name from customer");
+			while (rset.next()) {
+				String name = rset.getString(1);
+				logger.info("out of customer:  " + name);
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
 	@Test
+	@DataSet("DataSetExporterTest.xml")
 	public void exportDatasetTest() throws DatabaseUnitException, SQLException, IOException {
 		JsonDatabase connectionData = new JsonDatabase();
-		connectionData.setDbUrl("jdbc:mysql://127.0.0.1:3306/slc_test");
-		connectionData.setDbUser("slc");
-		connectionData.setDbPassword("slc1212");
+		connectionData.setDbUrl("jdbc:h2:~/test;INIT=CREATE SCHEMA IF NOT EXISTS TESTX");
+		connectionData.setDbUser("sa");
+		connectionData.setDbPassword("");
 		connectionData.setIdent("Ident-1");
-		ExportJsonCommand command= new ExportJsonCommand();
+		connectionData.setDbSchema("TESTX");
+		ExportJsonCommand command = new ExportJsonCommand();
 		command.setConnId("Ident-1");
 		command.setCommandId("comm-1");
 		command.setExportedFilePath(".//testFolder");
-		command.setTableName("sap_system");
+		command.setTableName("CUSTOMER");
 		command.setColumns("*");
-		
 
 		ByteArrayOutputStream resultStream = ExporterController.startExportForTable(connectionData, command);
 		assertNotNull("Did not create output stream!", resultStream);
 		String content = resultStream.toString();
-		assertTrue("Did not export the right table!", content.contains("sap_system"));
-		assertTrue("Did not export the right table!", content.contains("ACTIVE"));
+		assertTrue("Did not export the right table!", content.contains("Michael"));
 	}
 
 	@Override

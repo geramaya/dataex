@@ -34,7 +34,7 @@ public class ExporterController {
 		TableDescriptor discriptor = new TableDescriptor(exportCommand.getTableName());
 		discriptor.setOrderByClause(exportCommand.getOrderByClause());
 		discriptor.setWhereClause(exportCommand.getWhereClause());
-		discriptor.setSchemaName(databaseConnection.getSchemaName());
+		discriptor.setSchemaName(databaseConnection.getDbSchema());
 		discriptor.addField(exportCommand.getColumns());
 		return exporter.exportDataSet(discriptor);
 	}

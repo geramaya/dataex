@@ -3,11 +3,9 @@ package util;
 import static org.junit.Assert.assertNotNull;
 
 import java.sql.Connection;
-import java.util.Map;
 
 import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.Jdbi;
-import org.jdbi.v3.core.result.ResultIterable;
 import org.junit.Test;
 
 import de.aspera.dataexport.dao.DatabaseException;
@@ -22,18 +20,19 @@ public class ConnectionTest {
 
 	@Test
 	public void testConnection() throws DatabaseException {
-		Connection connection = JDBCConnection.getConnection("jdbc:mysql://127.0.0.1:3306/slc_dev", "root", "root");
+		Connection connection = JDBCConnection.getConnection("jdbc:h2:~/test;INIT=CREATE SCHEMA IF NOT EXISTS TESTX", "sa", "");
 		assertNotNull("No connection with database available", connection);
 	}
 
 	@Test
 	public void testConnectionJdbi() throws DatabaseException {
 
-		Connection connection = JDBCConnection.getConnection("jdbc:mysql://127.0.0.1:3306/slc_dev", "root", "root");
+		Connection connection = JDBCConnection.getConnection("jdbc:h2:~/test;INIT=CREATE SCHEMA IF NOT EXISTS TESTX", "sa", "");
 		Handle handle = Jdbi.open(connection);
-		ResultIterable<Map<String, Object>> fooMap = handle.createQuery("SELECT * FROM SLC_USER ").mapToMap();
+		handle.begin();
+		handle.isInTransaction();
+		handle.commit();
 		handle.close();
-
 	}
 
 }

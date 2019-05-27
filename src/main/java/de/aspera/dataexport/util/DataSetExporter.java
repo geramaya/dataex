@@ -10,6 +10,8 @@ import org.dbunit.database.AmbiguousTableNameException;
 import org.dbunit.database.IDatabaseConnection;
 import org.dbunit.dataset.DataSetException;
 import org.dbunit.dataset.xml.FlatXmlDataSet;
+import org.dbunit.ext.h2.H2Connection;
+import org.dbunit.ext.mssql.MsSqlConnection;
 import org.dbunit.ext.mysql.MySqlConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,8 +27,10 @@ public class DataSetExporter {
 
 	private static final Logger logger = LoggerFactory.getLogger(DataSetExporter.class);
 	private Connection connection;
+	private JsonDatabase databaseConnection;
 
 	public DataSetExporter(JsonDatabase databaseConnection) {
+		this.databaseConnection = databaseConnection;
 		this.connection = getConnection(databaseConnection);
 	}
 
@@ -40,7 +44,15 @@ public class DataSetExporter {
 	 */
 	public ByteArrayOutputStream exportDataSet(TableDescriptor... descriptors)
 			throws DatabaseUnitException, SQLException {
-		IDatabaseConnection conn = new MySqlConnection(connection, descriptors[0].getSchemaName());
+		
+		IDatabaseConnection conn = null;
+		if (databaseConnection.getDbUrl().contains("mysql"))
+			conn = new MySqlConnection(connection, descriptors[0].getSchemaName());
+		if (databaseConnection.getDbUrl().contains("mssql"))
+			conn = new MsSqlConnection(connection, descriptors[0].getSchemaName());
+		if (databaseConnection.getDbUrl().contains("h2"))
+			conn = new H2Connection(connection, descriptors[0].getSchemaName());
+
 		ByteArrayOutputStream outputStream = null;
 		// partial database export
 		QueryDataSet partialDataSet = new QueryDataSet(conn, descriptors[0].getSchemaName());
