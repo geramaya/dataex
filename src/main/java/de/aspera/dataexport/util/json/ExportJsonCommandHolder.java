@@ -41,6 +41,10 @@ public final class ExportJsonCommandHolder {
 		Type listType = new TypeToken<List<ExportJsonCommand>>() {
 		}.getType();
 		List<ExportJsonCommand> commands = gson.fromJson(reader, listType);
+		addCommandList(commands);
+	}
+
+	public void addCommandList(List<ExportJsonCommand> commands) throws ImportJsonCommandException {
 		for (ExportJsonCommand cmd : commands) {
 			String commId = cmd.getCommandId();
 			if (cmdRepo.keySet().contains(commId)) {
@@ -68,9 +72,11 @@ public final class ExportJsonCommandHolder {
 	public File getJasonFileConn() {
 		String filePath;
 		if (SystemUtils.IS_OS_WINDOWS) {
-			filePath = System.getProperty("user.home") + "\\." + Resources.PROJECT_NAME + "\\dataExporter_ExportCommands.json";
+			filePath = System.getProperty("user.home") + "\\." + Resources.PROJECT_NAME
+					+ "\\dataExporter_ExportCommands.json";
 		} else {
-			filePath = System.getProperty("user.home") + "/." + Resources.PROJECT_NAME + "dataExporter_ExportCommands.json";
+			filePath = System.getProperty("user.home") + "/." + Resources.PROJECT_NAME
+					+ "dataExporter_ExportCommands.json";
 		}
 		Path pathOfFile = Paths.get(filePath);
 		return pathOfFile.toFile();

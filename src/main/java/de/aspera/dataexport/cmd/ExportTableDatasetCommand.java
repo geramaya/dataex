@@ -56,9 +56,9 @@ public class ExportTableDatasetCommand implements CommandRunnable {
 			exportStream = ExporterController.startExportForTable(dataConnection, exportCommand);
 			File file;
 			if(SystemUtils.IS_OS_WINDOWS) {
-				file = new File(exportCommand.getExportedFilePath().concat("\\DataSet-Table-"+exportCommand.getTableName()+".xml"));
+				file = new File(exportCommand.getExportedFilePath().concat("\\DataSet-Table-"+exportCommand.getTableName()+dataConnection.getIdent()+".xml"));
 			}else  {
-				file = new File(exportCommand.getExportedFilePath().concat("/DataSet-Table-"+exportCommand.getTableName()+".xml"));
+				file = new File(exportCommand.getExportedFilePath().concat("/DataSet-Table-"+exportCommand.getTableName()+dataConnection.getIdent()+".xml"));
 			}
 			exportStream.writeTo(new FileOutputStream(file));
 		} catch (DatabaseUnitException | SQLException | IOException e) {
