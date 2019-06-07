@@ -10,6 +10,8 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import org.dbunit.DatabaseUnitException;
@@ -22,13 +24,14 @@ import de.aspera.dataexport.util.json.ExportJsonCommand;
 import de.aspera.dataexport.util.json.JsonDatabase;
 
 public class DataSetExporterTest extends BasicFacadeTest {
-	
+
 	protected final static Logger logger = Logger.getLogger(DataSetExporterTest.class.getName());
 
 	@BeforeClass
 	public static void initDb() {
 		try {
-			Connection conn = DriverManager.getConnection("jdbc:h2:~/test;INIT=CREATE SCHEMA IF NOT EXISTS TESTX", "sa", "");
+			Connection conn = DriverManager.getConnection("jdbc:h2:~/test;INIT=CREATE SCHEMA IF NOT EXISTS TESTX", "sa",
+					"");
 			Statement st = conn.createStatement();
 			st.execute("SET SCHEMA TESTX");
 			st.execute("DROP TABLE IF EXISTS `customer`");
@@ -60,8 +63,12 @@ public class DataSetExporterTest extends BasicFacadeTest {
 		command.setConnId("Ident-1");
 		command.setCommandId("comm-1");
 		command.setExportedFilePath(".//testFolder");
-		command.setTableName("CUSTOMER");
-		command.setColumns("*");
+		List<String> tabels = new ArrayList<String>();
+		tabels.add("CUSTOMER");
+		command.setTableNames(tabels);
+		List<String> columns = new ArrayList<String>();
+		columns.add("*");
+		command.setColumns(columns);
 
 		ByteArrayOutputStream resultStream = ExporterController.startExportForTable(connectionData, command);
 		assertNotNull("Did not create output stream!", resultStream);

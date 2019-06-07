@@ -14,12 +14,17 @@ public class JsonCommandHolderTest {
 
 	@Before
 	public void makeConnectionData() {
+		List<String> tablenames = new ArrayList<>();
+		tablenames.add("sap_sys");
+		tablenames.add("account_type");
+		List<String> columns = new ArrayList<>();
+		List<String> whereClauses = new ArrayList<>();
 		commandJsonObj = new ExportJsonCommand();
 		commandJsonObj.setCommandId("ID-1");
 		commandJsonObj.setConnId("connId");
-		commandJsonObj.setTableName("sap_sys");
-		commandJsonObj.setColumns("");
-		commandJsonObj.setWhereClause("x>2");
+		commandJsonObj.setTableNames(tablenames);
+		commandJsonObj.setColumns(columns);
+		commandJsonObj.setWhereClauses(whereClauses);
 		commandJsonObj.setExportedFilePath(System.getProperty("user.dir"));
 	}
 
@@ -68,9 +73,9 @@ public class JsonCommandHolderTest {
 		ExportJsonCommand cmd = new ExportJsonCommand();
 		cmd.setCommandId("ID-2");
 		cmd.setConnId("connId");
-		cmd.setTableName("sap_sys");
-		cmd.setColumns("");
-		cmd.setWhereClause("x>2");
+		List<String> tabels = new ArrayList<>();
+		tabels.add("sap_sys");
+		cmd.setTableNames(tabels);
 		cmd.setExportedFilePath(System.getProperty("user.dir"));
 		commands.add(commandJsonObj);
 		commands.add(cmd);

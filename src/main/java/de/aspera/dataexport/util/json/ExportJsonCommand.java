@@ -1,12 +1,14 @@
 package de.aspera.dataexport.util.json;
 
+import java.util.List;
+
 public class ExportJsonCommand {
 	private String commandId;
 	private String connId;
-	private String tableName;
-	private String columns;
-	private String whereClause;
-	private String orderByClause;
+	private List<String> tableNames;
+	private List<String> columns;
+	private List<String> whereClauses;
+	private List<String> orderByClauses;
 	private String exportedFilePath;
 
 	public String getCommandId() {
@@ -25,36 +27,36 @@ public class ExportJsonCommand {
 		this.connId = connId;
 	}
 
-	public String getTableName() {
-		return tableName;
+	public List<String> getTableNames() {
+		return tableNames;
 	}
 
-	public void setTableName(String table) {
-		this.tableName = table;
+	public void setTableNames(List<String> table) {
+		this.tableNames = table;
 	}
 
-	public String getColumns() {
+	public List<String> getColumns() {
 		return columns;
 	}
 
-	public void setColumns(String columns) {
+	public void setColumns(List<String> columns) {
 		this.columns = columns;
 	}
 
-	public String getWhereClause() {
-		return whereClause;
+	public List<String> getWhereClauses() {
+		return whereClauses;
 	}
 
-	public void setWhereClause(String whereClause) {
-		this.whereClause = whereClause;
+	public void setWhereClauses(List<String> whereClauses) {
+		this.whereClauses = whereClauses;
 	}
 
-	public String getOrderByClause() {
-		return orderByClause;
+	public List<String> getOrderByClauses() {
+		return orderByClauses;
 	}
 
-	public void setOrderByClause(String orderByClause) {
-		this.orderByClause = orderByClause;
+	public void setOrderByClauses(List<String> orderByClauses) {
+		this.orderByClauses = orderByClauses;
 	}
 
 	public String getExportedFilePath() {

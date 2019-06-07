@@ -4,6 +4,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.dbunit.DatabaseUnitException;
 import org.dbunit.database.AmbiguousTableNameException;
@@ -20,6 +22,7 @@ import de.aspera.dataexport.util.json.JsonDatabase;
 
 /**
  * Use this to export data from database to a flat XML data set..
+ * 
  * @author Petr Stastny
  * 
  */
@@ -42,20 +45,20 @@ public class DataSetExporter {
 	 * @throws DatabaseUnitException
 	 * @throws SQLException
 	 */
-	public ByteArrayOutputStream exportDataSet(TableDescriptor... descriptors)
+	public ByteArrayOutputStream exportDataSet(List<TableDescriptor> descriptors)
 			throws DatabaseUnitException, SQLException {
-		
+
 		IDatabaseConnection conn = null;
 		if (databaseConnection.getDbUrl().contains("mysql"))
-			conn = new MySqlConnection(connection, descriptors[0].getSchemaName());
+			conn = new MySqlConnection(connection, descriptors.get(0).getSchemaName());
 		if (databaseConnection.getDbUrl().contains("mssql"))
-			conn = new MsSqlConnection(connection, descriptors[0].getSchemaName());
+			conn = new MsSqlConnection(connection, descriptors.get(0).getSchemaName());
 		if (databaseConnection.getDbUrl().contains("h2"))
-			conn = new H2Connection(connection, descriptors[0].getSchemaName());
+			conn = new H2Connection(connection, descriptors.get(0).getSchemaName());
 
 		ByteArrayOutputStream outputStream = null;
 		// partial database export
-		QueryDataSet partialDataSet = new QueryDataSet(conn, descriptors[0].getSchemaName());
+		QueryDataSet partialDataSet = new QueryDataSet(conn, descriptors.get(0).getSchemaName());
 		try {
 			for (TableDescriptor descriptor : descriptors) {
 				partialDataSet.addQry(descriptor);
@@ -78,6 +81,7 @@ public class DataSetExporter {
 
 	/**
 	 * Create and returns a standard jdbc database connection
+	 * 
 	 * @param databaseConnection
 	 * @return
 	 */
