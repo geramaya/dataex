@@ -22,6 +22,7 @@ import org.unitils.dbunit.annotation.DataSet;
 import de.aspera.dataexport.util.ExporterController;
 import de.aspera.dataexport.util.json.ExportJsonCommand;
 import de.aspera.dataexport.util.json.JsonDatabase;
+import de.aspera.dataexport.util.json.TableQuery;
 
 public class DataSetExporterTest extends BasicFacadeTest {
 
@@ -63,13 +64,13 @@ public class DataSetExporterTest extends BasicFacadeTest {
 		command.setConnId("Ident-1");
 		command.setCommandId("comm-1");
 		command.setExportedFilePath(".//testFolder");
-		List<String> tabels = new ArrayList<String>();
-		tabels.add("CUSTOMER");
-		command.setTableNames(tabels);
-		List<String> columns = new ArrayList<String>();
-		columns.add("*");
-		command.setColumns(columns);
-
+		List<TableQuery> tables = new ArrayList<>();
+		TableQuery table= new TableQuery();
+		table.setTableName("CUSTOMER");
+		table.setColumns("*");
+		tables.add(table);
+		command.setTables(tables);
+		
 		ByteArrayOutputStream resultStream = ExporterController.startExportForTable(connectionData, command);
 		assertNotNull("Did not create output stream!", resultStream);
 		String content = resultStream.toString();

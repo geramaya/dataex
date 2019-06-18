@@ -5,11 +5,16 @@ import java.util.List;
 public class ExportJsonCommand {
 	private String commandId;
 	private String connId;
-	private List<String> tableNames;
-	private List<String> columns;
-	private List<String> whereClauses;
-	private List<String> orderByClauses;
+	private List<TableQuery> tables;
 	private String exportedFilePath;
+
+	public List<TableQuery> getTables() {
+		return tables;
+	}
+
+	public void setTables(List<TableQuery> tables) {
+		this.tables = tables;
+	}
 
 	public String getCommandId() {
 		return commandId;
@@ -25,38 +30,6 @@ public class ExportJsonCommand {
 
 	public void setConnId(String connId) {
 		this.connId = connId;
-	}
-
-	public List<String> getTableNames() {
-		return tableNames;
-	}
-
-	public void setTableNames(List<String> table) {
-		this.tableNames = table;
-	}
-
-	public List<String> getColumns() {
-		return columns;
-	}
-
-	public void setColumns(List<String> columns) {
-		this.columns = columns;
-	}
-
-	public List<String> getWhereClauses() {
-		return whereClauses;
-	}
-
-	public void setWhereClauses(List<String> whereClauses) {
-		this.whereClauses = whereClauses;
-	}
-
-	public List<String> getOrderByClauses() {
-		return orderByClauses;
-	}
-
-	public void setOrderByClauses(List<String> orderByClauses) {
-		this.orderByClauses = orderByClauses;
 	}
 
 	public String getExportedFilePath() {

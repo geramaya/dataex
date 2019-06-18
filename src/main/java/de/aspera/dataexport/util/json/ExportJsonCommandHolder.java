@@ -53,11 +53,13 @@ public final class ExportJsonCommandHolder {
 				throw new ImportJsonCommandException("Id for Command not defined");
 			} else if (cmd.getExportedFilePath().isEmpty() || !new File(cmd.getExportedFilePath()).isDirectory()) {
 				throw new ImportJsonCommandException("Path for the exported File is empty or does not exist");
-			} else if (cmd.getTableNames().isEmpty()) {
-				throw new ImportJsonCommandException("Table name is empty");
 			} else if (cmd.getConnId().isEmpty()) {
 				throw new ImportJsonCommandException("Connection Id is empty");
 			} else {
+				for(TableQuery table : cmd.getTables()) {
+					if(table.getTableName().isEmpty())
+						throw new ImportJsonCommandException("Table name is empty");
+				}
 				cmdRepo.put(commId, cmd);
 			}
 		}

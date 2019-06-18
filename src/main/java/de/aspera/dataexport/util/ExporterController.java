@@ -12,6 +12,7 @@ import de.aspera.dataexport.util.json.ExportJsonCommand;
 import de.aspera.dataexport.util.json.JsonConnectionHolder;
 import de.aspera.dataexport.util.json.JsonConnectionReadException;
 import de.aspera.dataexport.util.json.JsonDatabase;
+import de.aspera.dataexport.util.json.TableQuery;
 
 public class ExporterController {
 
@@ -32,31 +33,18 @@ public class ExporterController {
 	public static ByteArrayOutputStream startExportForTable(JsonDatabase databaseConnection,
 			ExportJsonCommand exportCommand) throws DatabaseUnitException, SQLException {
 		List<TableDescriptor> descriptors = new ArrayList<>();
-		Iterator<String> whereClauseIter = null;
-		Iterator<String> oderByClauseIter = null;
-		Iterator<String> tableColumsIter = null;
 		if (databaseConnection == null)
 			throw new IllegalArgumentException("The databaseConnection can not be null");
 		DataSetExporter exporter = new DataSetExporter(databaseConnection);
-
-		if (exportCommand.getOrderByClauses() != null)
-			oderByClauseIter = exportCommand.getOrderByClauses().iterator();
-		if (exportCommand.getWhereClauses() != null)
-			whereClauseIter = exportCommand.getWhereClauses().iterator();
-		if (exportCommand.getColumns() != null)
-			tableColumsIter = exportCommand.getColumns().iterator();
-		for (String tabelName : exportCommand.getTableNames()) {
-			TableDescriptor descriptor = new TableDescriptor(tabelName);
+		for (TableQuery table : exportCommand.getTables()) {
+			TableDescriptor descriptor = new TableDescriptor(table.getTableName());
 			descriptor.setSchemaName(databaseConnection.getDbSchema());
-			if (oderByClauseIter != null)
-				if (oderByClauseIter.hasNext())
-					descriptor.setOrderByClause(oderByClauseIter.next());
-			if (whereClauseIter != null)
-				if (whereClauseIter.hasNext())
-					descriptor.setWhereClause(whereClauseIter.next());
-			if (tableColumsIter != null)
-				if (tableColumsIter.hasNext())
-					descriptor.addField(tableColumsIter.next());
+			if (table.getOrderByClaus() != null)
+				descriptor.setOrderByClause(table.getOrderByClaus());
+			if (table.getWhereClaus() != null)
+				descriptor.setWhereClause(table.getWhereClaus());
+			if (!table.getColumns().isEmpty())
+				descriptor.addField(table.getColumns());
 				else
 					descriptor.addField("*");
 			descriptors.add(descriptor);

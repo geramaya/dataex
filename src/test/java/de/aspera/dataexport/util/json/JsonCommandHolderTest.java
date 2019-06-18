@@ -14,17 +14,17 @@ public class JsonCommandHolderTest {
 
 	@Before
 	public void makeConnectionData() {
-		List<String> tablenames = new ArrayList<>();
-		tablenames.add("sap_sys");
-		tablenames.add("account_type");
-		List<String> columns = new ArrayList<>();
-		List<String> whereClauses = new ArrayList<>();
+		List<TableQuery> tables = new ArrayList<>();
+		TableQuery table1 = new TableQuery();
+		TableQuery table2 = new TableQuery();
+		table1.setTableName("sap_sys");
+		table2.setTableName("account_type");
+		tables.add(table1);
+		tables.add(table2);
 		commandJsonObj = new ExportJsonCommand();
 		commandJsonObj.setCommandId("ID-1");
 		commandJsonObj.setConnId("connId");
-		commandJsonObj.setTableNames(tablenames);
-		commandJsonObj.setColumns(columns);
-		commandJsonObj.setWhereClauses(whereClauses);
+		commandJsonObj.setTables(tables);
 		commandJsonObj.setExportedFilePath(System.getProperty("user.dir"));
 	}
 
@@ -73,9 +73,11 @@ public class JsonCommandHolderTest {
 		ExportJsonCommand cmd = new ExportJsonCommand();
 		cmd.setCommandId("ID-2");
 		cmd.setConnId("connId");
-		List<String> tabels = new ArrayList<>();
-		tabels.add("sap_sys");
-		cmd.setTableNames(tabels);
+		List<TableQuery> tables = new ArrayList<>();
+		TableQuery table2 = new TableQuery();
+		table2.setTableName("sap_sys");
+		tables.add(table2);
+		cmd.setTables(tables);
 		cmd.setExportedFilePath(System.getProperty("user.dir"));
 		commands.add(commandJsonObj);
 		commands.add(cmd);
