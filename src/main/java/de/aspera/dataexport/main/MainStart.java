@@ -112,7 +112,7 @@ public class MainStart {
         Graphics2D graphics = (Graphics2D) g;
         graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         // the banner text may affect width and height
-        graphics.drawString("LocApp", 6, 24);
+        graphics.drawString("DataEX", 6, 24);
         ImageIO.write(image, "png", File.createTempFile("AsciiBanner.png", null));
 
         // need to adjust for width and height

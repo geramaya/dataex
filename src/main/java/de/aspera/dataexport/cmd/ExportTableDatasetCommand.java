@@ -9,10 +9,10 @@ import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.dbunit.DatabaseUnitException;
 
-import de.aspera.dataexport.main.MainStart;
 import de.aspera.dataexport.util.ExporterController;
 import de.aspera.dataexport.util.json.ExportJsonCommand;
 import de.aspera.dataexport.util.json.ExportJsonCommandHolder;
@@ -51,7 +51,18 @@ public class ExportTableDatasetCommand implements CommandRunnable {
 		commandRepo = ExportJsonCommandHolder.getInstance();
 		commandRepo.importJsonCommands();
 		String commandId = cmdContext.nextArgument();
+		
+		if (StringUtils.isEmpty(commandId)) {
+			LOGGER.log(Level.WARNING, "A commandId is required to proceed!");
+			return;
+		}
+		
 		exportCommand = commandRepo.getCommand(commandId);
+		if (exportCommand == null) {
+			LOGGER.log(Level.WARNING, "Your commandId:\"{0}\" could not found!", commandId);
+			return;
+		}
+		
 		dataConnection = connectionRepo.getJsonDatabases(exportCommand.getConnId());
 		try {
 			exportStream = ExporterController.startExportForTable(dataConnection, exportCommand);

@@ -69,6 +69,7 @@ public class CommandContext {
         addCommand("help", HelpCommand.class);
         addCommand("init", ConfigInitCommand.class);
         addCommand("i", ConfigInitCommand.class);
+        addCommand("e", ExportTableDatasetCommand.class);
         addCommand("export", ExportTableDatasetCommand.class);
     }
 }

@@ -140,7 +140,7 @@
 					<!-- MainClass in mainfest make a executable jar -->
 					<archive>
 						<manifest>
-							<mainClass>de.aspera.locapp.main.MainStart</mainClass>
+							<mainClass>de.aspera.dataexport.main.MainStart</mainClass>
 						</manifest>
 					</archive>
 				</configuration>
