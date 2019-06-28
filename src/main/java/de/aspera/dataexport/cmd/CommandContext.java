@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
 
 public class CommandContext {
 
@@ -57,6 +58,10 @@ public class CommandContext {
 
     public void clearArguments() {
         argumentStack.clear();
+    }
+    
+    public Set<String> getCommands() {
+    	return commandMap.keySet();
     }
 
     /**
