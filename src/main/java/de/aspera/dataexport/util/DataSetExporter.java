@@ -51,7 +51,7 @@ public class DataSetExporter {
 		IDatabaseConnection conn = null;
 		if (databaseConnection.getDbUrl().contains("mysql"))
 			conn = new MySqlConnection(connection, descriptors.get(0).getSchemaName());
-		if (databaseConnection.getDbUrl().contains("mssql"))
+		if (databaseConnection.getDbUrl().contains("sqlserver"))
 			conn = new MsSqlConnection(connection, descriptors.get(0).getSchemaName());
 		if (databaseConnection.getDbUrl().contains("h2"))
 			conn = new H2Connection(connection, descriptors.get(0).getSchemaName());

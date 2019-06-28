@@ -45,6 +45,7 @@ public class MainStart {
             
             // Load dbdrivers once time to detect them over the class loader!
             Class.forName("com.mysql.jdbc.Driver").newInstance();
+            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver").newInstance();
 
             CommandContext.getInstance().executeCommand("h");
             Resources.getInstance();

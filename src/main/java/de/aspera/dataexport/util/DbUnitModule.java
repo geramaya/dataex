@@ -82,7 +82,7 @@ public class DbUnitModule extends org.unitils.dbunit.DbUnitModule {
      * 
      * @return
      */
-    protected DatabaseType determineDatabaseType() {
+	protected DatabaseType determineDatabaseType() {
         DbSupport dbSupport = getDefaultDbSupport();
         DataSource ds = dbSupport.getSQLHandler().getDataSource();
 
@@ -96,19 +96,19 @@ public class DbUnitModule extends org.unitils.dbunit.DbUnitModule {
 
         DatabaseType databaseType = DatabaseType.UNKNOWN;
 
-        if (url.indexOf("mysql") > -1) {
-            databaseType = DatabaseType.MYSQL;
-            } 
-//            else if (url.indexOf("sqlserver") > -1) {
-//            databaseType = DatabaseType.MSSQL;
-//        } else if (url.indexOf("hsqldb") > -1) {
+		if (url.indexOf("mysql") > -1) {
+			databaseType = DatabaseType.MYSQL;
+		} else if (url.indexOf("sqlserver") > -1) {
+			databaseType = DatabaseType.MSSQL;
+		}
+//            else if (url.indexOf("hsqldb") > -1) {
 //            databaseType = DatabaseType.HSQL;
 //        } else if (url.indexOf("jdbc:h2") > -1) {
 //            databaseType = DatabaseType.H2;
-         else {
-            // ALTER TABLE tableName ALTER COLUMN columnName RESTART WITH long
-            fail("We do not support resetAutoincrementValue for this database, jdbc url: " + url);
-        }
+		else {
+			// ALTER TABLE tableName ALTER COLUMN columnName RESTART WITH long
+			fail("We do not support resetAutoincrementValue for this database, jdbc url: " + url);
+		}
 
         logger.debug("determined database type {}", databaseType);
 
