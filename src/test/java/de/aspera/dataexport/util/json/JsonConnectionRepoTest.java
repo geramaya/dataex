@@ -5,19 +5,16 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-
-import de.aspera.dataexport.util.json.DuplicateConnIdException;
-import de.aspera.dataexport.util.json.JsonConnectionHolder;
-import de.aspera.dataexport.util.json.JsonConnectionReadException;
-import de.aspera.dataexport.util.json.NoDriverDefinedException;
-import de.aspera.dataexport.util.json.NoIdDefinedException;
 
 public class JsonConnectionRepoTest {
 	JsonObject connectionDetails;
+	private Gson gson;
 
 	@Before
 	public void makeConnectionData() {
+		gson= new Gson();
 		connectionDetails = new JsonObject();
 		String ID = "ID-1";
 		String Driver = "com.mysql.jdbc.Driver";
@@ -37,8 +34,7 @@ public class JsonConnectionRepoTest {
 		connectionRepo.deleteConnections();
 		connectionDetails.addProperty("dbUrl", "jdbc:jtds:sqlserver://192.168.111.150:1433/slc_dev");
 		connectionDetails.addProperty("dbDriver", "");
-		JsonObject connection = new JsonObject();
-		connection.add("Connection", connectionDetails);
+		JsonDatabase connection = gson.fromJson(connectionDetails, JsonDatabase.class);
 		connectionRepo.parseJsonConnection(connection);
 
 	}
@@ -48,18 +44,15 @@ public class JsonConnectionRepoTest {
 		JsonConnectionHolder connectionRepo = JsonConnectionHolder.getInstance();
 		connectionRepo.deleteConnections();
 		connectionDetails.addProperty("ident", "");
-		JsonObject connection = new JsonObject();
-		connection.add("Connection", connectionDetails);
+		JsonDatabase connection = gson.fromJson(connectionDetails, JsonDatabase.class);
 		connectionRepo.parseJsonConnection(connection);
 
 	}
 
 	@Test(expected = DuplicateConnIdException.class)
 	public void testReadDatabaseThrowsItenticalIDException() throws JsonConnectionReadException {
-		JsonObject connectionOne = new JsonObject();
-		connectionOne.add("Connection", connectionDetails);
-		JsonObject connectionTwo = new JsonObject();
-		connectionTwo.add("Connection", connectionDetails);
+		JsonDatabase connectionOne = gson.fromJson(connectionDetails, JsonDatabase.class);;
+		JsonDatabase connectionTwo = gson.fromJson(connectionDetails, JsonDatabase.class);
 		JsonConnectionHolder connectionRepo = JsonConnectionHolder.getInstance();
 		connectionRepo.deleteConnections();
 		connectionRepo.parseJsonConnection(connectionOne);
@@ -70,9 +63,8 @@ public class JsonConnectionRepoTest {
 	public void testReadJsonDbValues() throws JsonConnectionReadException {
 		JsonConnectionHolder connectionRepo = JsonConnectionHolder.getInstance();
 		for (int i = 0; i < 6; i++) {
-			JsonObject conn = new JsonObject();
 			connectionDetails.addProperty("ident", "ID-" + i);
-			conn.add("Connection", connectionDetails);
+			JsonDatabase conn = gson.fromJson(connectionDetails, JsonDatabase.class);
 			connectionRepo.parseJsonConnection(conn);
 		}
 		assertEquals("Wrong number of saved Connections", 6, connectionRepo.getAllJsonDatabases().size());

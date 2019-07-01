@@ -61,6 +61,8 @@ public class ConfigInitCommand implements CommandRunnable {
 		File file;
 		Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
 		List<TableQuery> tablesList = new ArrayList<TableQuery>();
+		List<ExportJsonCommand> jsonCommands = new ArrayList<>();
+		List<JsonDatabase> jsonConnections = new ArrayList<>();
 
 		// Write Connection file
 		if (SystemUtils.IS_OS_WINDOWS) {
@@ -71,14 +73,17 @@ public class ConfigInitCommand implements CommandRunnable {
 		file = new File(filePath);
 		if(!file.exists()) {
 			fileWriter = new FileWriter(file);
-			JsonDatabase jsonDB = new JsonDatabase();
-			jsonDB.setIdent("uniqe-connection-Id");
-			jsonDB.setDbDriver("Db-Driver");
-			jsonDB.setDbPassword("root");
-			jsonDB.setDbSchema("schema-1");
-			jsonDB.setDbUrl("database-URL");
-			jsonDB.setDbUser("root");
-			gson.toJson(jsonDB, fileWriter);
+			for(int i=0;i<2;i++) {
+				JsonDatabase jsonDB = new JsonDatabase();
+				jsonDB.setIdent("uniqe-connection-Id-"+i);
+				jsonDB.setDbDriver("Db-Driver");
+				jsonDB.setDbPassword("root");
+				jsonDB.setDbSchema("schema-1");
+				jsonDB.setDbUrl("database-URL");
+				jsonDB.setDbUser("root");
+				jsonConnections.add(jsonDB);
+			}
+			gson.toJson(jsonConnections, fileWriter);
 			fileWriter.close();
 		}
 		// Write Command file
@@ -92,20 +97,23 @@ public class ConfigInitCommand implements CommandRunnable {
 		file = new File(filePath);
 		if(!file.exists()) {
 			fileWriter = new FileWriter(file);
-			ExportJsonCommand command = new ExportJsonCommand();
-			command.setConnId("uniqe-connection-Id");
-			for (int i = 0; i < 2; i++) {
-				TableQuery tab = new TableQuery();
-				tab.setTableName("tab-" + i);
-				tab.setColumns("col1,col2,col3");
-				tab.setOrderByClaus("col1 asc");
-				tab.setWhereClaus("col1='wert1' and col2='wert2'");
-				tablesList.add(tab);
+			for(int i=0;i<2;i++) {
+				ExportJsonCommand command = new ExportJsonCommand();
+				command.setConnId("uniqe-connection-Id-"+i);
+				command.setTables(tablesList);
+				command.setCommandId("uniqe-command-Id-"+i);
+				command.setExportedFilePath(System.getProperty("user.home"));
+				for (int j = 0; j < 2; j++) {
+					TableQuery tab = new TableQuery();
+					tab.setTableName("tab-" + j);
+					tab.setColumns("col1,col2,col3");
+					tab.setOrderByClaus("col1 asc");
+					tab.setWhereClaus("col1='wert1' and col2='wert2'");
+					tablesList.add(tab);
+				}
+				jsonCommands.add(command);
 			}
-			command.setTables(tablesList);
-			command.setCommandId("uniqe-command-Id");
-			command.setExportedFilePath("Path where the Dataset will be exported");
-			gson.toJson(command, fileWriter);
+			gson.toJson(jsonCommands, fileWriter);
 			fileWriter.close();
 
 		}

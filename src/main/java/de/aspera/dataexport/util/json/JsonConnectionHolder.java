@@ -3,9 +3,11 @@ package de.aspera.dataexport.util.json;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.lang.reflect.Type;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -17,6 +19,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 
 public final class JsonConnectionHolder {
@@ -24,6 +27,7 @@ public final class JsonConnectionHolder {
 	public final static String PROJECT_NAME = "dataExporter";
 	private Map<String, JsonDatabase> dbConnections = new HashMap<>();
 	private static final Logger logger = Logger.getLogger(JsonConnectionHolder.class.getName());
+	private Gson gson = new Gson();
 
 	private JsonConnectionHolder() {
 
@@ -50,10 +54,11 @@ public final class JsonConnectionHolder {
 		try {
 			JsonReader reader = new JsonReader(new FileReader(getJasonFileConn()));
 			reader.setLenient(true);
-			Object obj = jsonParser.parse(reader);
-			JsonArray jsonConnectionArr = (JsonArray) obj;
-			for (JsonElement element : jsonConnectionArr) {
-				parseJsonConnection(element);
+			Type listType = new TypeToken<List<JsonDatabase>>() {
+			}.getType();
+			List<JsonDatabase> connectionList = gson.fromJson(reader, listType);
+			for (JsonDatabase conn : connectionList) {
+				parseJsonConnection(conn);
 			}
 		} catch (FileNotFoundException e) {
 			logger.log(Level.SEVERE, e.getMessage(), e);
@@ -62,11 +67,7 @@ public final class JsonConnectionHolder {
 		}
 	}
 
-	public void parseJsonConnection(JsonElement element) throws JsonConnectionReadException {
-		Gson gson = new Gson();
-		JsonObject jsonObj = (JsonObject) element;
-		JsonObject connectionObj = (JsonObject) jsonObj.get("Connection");
-		JsonDatabase dbConn = gson.fromJson(connectionObj.toString(), JsonDatabase.class);
+	public void parseJsonConnection(JsonDatabase dbConn) throws JsonConnectionReadException {
 		if (dbConn.getIdent().isEmpty()) {
 			throw new NoIdDefinedException("Id field is empty");
 		} else if (dbConnections.keySet().contains(dbConn.getIdent())) {
