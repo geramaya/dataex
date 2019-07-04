@@ -1,14 +1,16 @@
 package de.aspera.dataexport.util;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.dbunit.DatabaseUnitException;
 
 import de.aspera.dataexport.util.json.ExportJsonCommand;
+import de.aspera.dataexport.util.json.ExportJsonCommandHolder;
+import de.aspera.dataexport.util.json.ImportJsonCommandException;
 import de.aspera.dataexport.util.json.JsonConnectionHolder;
 import de.aspera.dataexport.util.json.JsonConnectionReadException;
 import de.aspera.dataexport.util.json.JsonDatabase;
@@ -41,8 +43,8 @@ public class ExporterController {
 			descriptor.setSchemaName(databaseConnection.getDbSchema());
 			if (table.getOrderByClaus() != null)
 				descriptor.setOrderByClause(table.getOrderByClaus());
-			if (table.getWhereClaus() != null)
-				descriptor.setWhereClause(table.getWhereClaus());
+			if (table.getWhereCondition() != null)
+				descriptor.setWhereClause(table.getWhereCondition());
 			if (!table.getColumns().isEmpty())
 				descriptor.addField(table.getColumns());
 				else
@@ -53,7 +55,14 @@ public class ExporterController {
 	}
 
 	public static void readJsonDatabaseFile() throws JsonConnectionReadException {
+		JsonConnectionHolder.getInstance().deleteConnections();
 		JsonConnectionHolder.getInstance().initJsonDatabases();
+	}
+
+	public static void readJsonCommandsFile() throws FileNotFoundException, ImportJsonCommandException {
+		ExportJsonCommandHolder.getInstance().deleteCommands();
+		ExportJsonCommandHolder.getInstance().importJsonCommands();
+		
 	}
 
 }

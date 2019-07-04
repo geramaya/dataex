@@ -107,8 +107,8 @@ public class ConfigInitCommand implements CommandRunnable {
 					TableQuery tab = new TableQuery();
 					tab.setTableName("tab-" + j);
 					tab.setColumns("col1,col2,col3");
-					tab.setOrderByClaus("col1 asc");
-					tab.setWhereClaus("col1='wert1' and col2='wert2'");
+					tab.setOrderByCondition("col1 asc");
+					tab.setWhereCondition("col1='wert1' and col2='wert2'");
 					tablesList.add(tab);
 				}
 				jsonCommands.add(command);

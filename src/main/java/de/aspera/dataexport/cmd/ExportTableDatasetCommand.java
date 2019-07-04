@@ -46,10 +46,10 @@ public class ExportTableDatasetCommand implements CommandRunnable {
 
 	private void init() throws JsonConnectionReadException, ImportJsonCommandException, IOException {
 		ExporterController.readJsonDatabaseFile();
+		ExporterController.readJsonCommandsFile();
 		connectionRepo = JsonConnectionHolder.getInstance();
 		cmdContext = CommandContext.getInstance();
 		commandRepo = ExportJsonCommandHolder.getInstance();
-		commandRepo.importJsonCommands();
 		String commandId = cmdContext.nextArgument();
 		
 		if (StringUtils.isEmpty(commandId)) {

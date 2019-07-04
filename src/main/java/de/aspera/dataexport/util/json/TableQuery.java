@@ -3,8 +3,8 @@ package de.aspera.dataexport.util.json;
 public class TableQuery {
 	private String tableName;
 	private String columns;
-	private String whereClaus;
-	private String orderByClaus;
+	private String whereCondition;
+	private String orderByCondition;
 
 	public String getTableName() {
 		return tableName;
@@ -22,19 +22,19 @@ public class TableQuery {
 		this.columns = columns;
 	}
 
-	public String getWhereClaus() {
-		return whereClaus;
+	public String getWhereCondition() {
+		return whereCondition;
 	}
 
-	public void setWhereClaus(String whereClaus) {
-		this.whereClaus = whereClaus;
+	public void setWhereCondition(String whereCondition) {
+		this.whereCondition = whereCondition;
 	}
 
 	public String getOrderByClaus() {
-		return orderByClaus;
+		return orderByCondition;
 	}
 
-	public void setOrderByClaus(String orderByClaus) {
-		this.orderByClaus = orderByClaus;
+	public void setOrderByCondition(String orderByCondition) {
+		this.orderByCondition = orderByCondition;
 	}
 }

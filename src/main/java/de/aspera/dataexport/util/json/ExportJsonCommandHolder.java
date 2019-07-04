@@ -3,12 +3,15 @@ package de.aspera.dataexport.util.json;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.commons.lang3.SystemUtils;
 
@@ -16,12 +19,15 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 
+import de.aspera.dataexport.cmd.ConfigInitCommand;
 import de.aspera.dataexport.util.Resources;
 
 public final class ExportJsonCommandHolder {
+	private static final Logger LOGGER = Logger.getLogger(ConfigInitCommand.class.getName());
 	private Map<String, ExportJsonCommand> cmdRepo = new HashMap<>();
 	private static ExportJsonCommandHolder instance;
 	private Gson gson = new Gson();
+	private JsonReader jsonReader;
 
 	private ExportJsonCommandHolder() {
 
@@ -36,12 +42,19 @@ public final class ExportJsonCommandHolder {
 
 	public void importJsonCommands() throws FileNotFoundException, ImportJsonCommandException {
 		cmdRepo = new HashMap<>();
-		JsonReader reader = new JsonReader(new FileReader(getJasonFileConn()));
-		reader.setLenient(true);
+		FileReader reader = new FileReader(getJasonFileConn());
+		jsonReader = new JsonReader(reader);
+		jsonReader.setLenient(true);
 		Type listType = new TypeToken<List<ExportJsonCommand>>() {
 		}.getType();
 		List<ExportJsonCommand> commands = gson.fromJson(reader, listType);
 		addCommandList(commands);
+		try {
+			reader.close();
+			jsonReader.close();
+		} catch (IOException e) {
+			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+		}
 	}
 
 	public void addCommandList(List<ExportJsonCommand> commands) throws ImportJsonCommandException {
@@ -80,6 +93,11 @@ public final class ExportJsonCommandHolder {
 		}
 		Path pathOfFile = Paths.get(filePath);
 		return pathOfFile.toFile();
+	}
+
+	public void deleteCommands() {
+		cmdRepo.clear();
+		
 	}
 
 }

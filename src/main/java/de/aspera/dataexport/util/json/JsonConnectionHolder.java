@@ -3,6 +3,7 @@ package de.aspera.dataexport.util.json;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -15,10 +16,6 @@ import java.util.logging.Logger;
 import org.apache.commons.lang3.SystemUtils;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 
@@ -50,19 +47,24 @@ public final class JsonConnectionHolder {
 
 	public void initJsonDatabases() {
 		dbConnections = new HashMap<>();
-		JsonParser jsonParser = new JsonParser();
+		FileReader reader;
 		try {
-			JsonReader reader = new JsonReader(new FileReader(getJasonFileConn()));
-			reader.setLenient(true);
+			reader = new FileReader(getJasonFileConn());
+			JsonReader jsonReader = new JsonReader(reader);
+			jsonReader.setLenient(true);
 			Type listType = new TypeToken<List<JsonDatabase>>() {
 			}.getType();
-			List<JsonDatabase> connectionList = gson.fromJson(reader, listType);
+			List<JsonDatabase> connectionList = gson.fromJson(jsonReader, listType);
 			for (JsonDatabase conn : connectionList) {
 				parseJsonConnection(conn);
 			}
+			jsonReader.close();
+			reader.close();
 		} catch (FileNotFoundException e) {
 			logger.log(Level.SEVERE, e.getMessage(), e);
 		} catch (JsonConnectionReadException e) {
+			logger.log(Level.SEVERE, e.getMessage(), e);
+		} catch (IOException e) {
 			logger.log(Level.SEVERE, e.getMessage(), e);
 		}
 	}
