@@ -65,7 +65,7 @@ public class MainStart {
      * CLI works in a recursive mode and will stay until the program will quit
      * or broken.
      */
-    private static void promptCLI() {
+    public static void promptCLI() {
         System.out.print("\n>> command: ");
         String cmdline = scanner.nextLine().trim();
         if (cmdline.contains(BLANK)) {
@@ -82,6 +82,10 @@ public class MainStart {
                 CommandContext.getInstance().executeCommand(cmd);
             } catch (InstantiationException | IllegalAccessException e) {
                 logger.log(Level.SEVERE, e.getMessage(), e);
+            }
+            finally {
+            	System.out.println("\n");
+            	promptCLI();
             }
         } else {
             logger.warning("Sorry! This command is unknown!");

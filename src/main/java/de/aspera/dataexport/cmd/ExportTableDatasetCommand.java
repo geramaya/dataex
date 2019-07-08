@@ -13,6 +13,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.dbunit.DatabaseUnitException;
 
+import de.aspera.dataexport.main.MainStart;
 import de.aspera.dataexport.util.ExporterController;
 import de.aspera.dataexport.util.json.ExportJsonCommand;
 import de.aspera.dataexport.util.json.ExportJsonCommandHolder;
@@ -40,6 +41,8 @@ public class ExportTableDatasetCommand implements CommandRunnable {
 			init();
 		} catch (JsonConnectionReadException | ImportJsonCommandException | IOException e) {
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+			System.out.println("\n");
+			MainStart.promptCLI();
 		}
 
 	}
@@ -77,6 +80,8 @@ public class ExportTableDatasetCommand implements CommandRunnable {
 			exportStream.writeTo(fileOut);
 		} catch (DatabaseUnitException | SQLException | IOException e) {
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+			System.out.println("\n");
+			MainStart.promptCLI();
 		} finally {
 			if (exportStream != null)
 				IOUtils.closeQuietly(exportStream);

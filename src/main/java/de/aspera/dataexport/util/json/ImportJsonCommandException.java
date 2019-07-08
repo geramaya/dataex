@@ -1,6 +1,6 @@
 package de.aspera.dataexport.util.json;
 
-public class ImportJsonCommandException extends Exception {
+public class ImportJsonCommandException extends RuntimeException {
 	/**
 	 * 
 	 */
