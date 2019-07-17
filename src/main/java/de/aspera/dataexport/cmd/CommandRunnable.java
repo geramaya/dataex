@@ -8,7 +8,6 @@ package de.aspera.dataexport.cmd;
  *
  */
 public interface CommandRunnable {
-    public static final String EMPTY_VALUE = "";
 
-    void run() throws Throwable;
+    void run() throws CommandException;
 }

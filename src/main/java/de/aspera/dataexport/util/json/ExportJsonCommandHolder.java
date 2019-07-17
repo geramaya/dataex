@@ -29,9 +29,7 @@ public final class ExportJsonCommandHolder {
 	private Gson gson = new Gson();
 	private JsonReader jsonReader;
 
-	private ExportJsonCommandHolder() {
-
-	}
+	private ExportJsonCommandHolder() {}
 
 	public static ExportJsonCommandHolder getInstance() {
 		if (instance == null) {

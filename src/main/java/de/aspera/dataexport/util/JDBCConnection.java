@@ -72,13 +72,13 @@ public class JDBCConnection {
 
 
 	/**
-	 * Weiß nicht, bitte prüfen!
 	 * 
 	 * @param table
 	 * @param column
 	 * @param ascending
 	 * @return sorted list of values from specific column
 	 * @throws IOException
+	 * @deprecated check and may be delete it!
 	 */
 	public static List<String> getSortedColumnValues(String table, String column, boolean ascending, String url_database, String username, String password)
 			throws IOException {

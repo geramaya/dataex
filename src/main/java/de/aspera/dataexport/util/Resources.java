@@ -38,7 +38,7 @@ public class Resources {
      *
      * @return die Ressourcen.
      */
-    public static synchronized Resources getInstance() {
+    public static Resources getInstance() {
         if (resources == null) {
             initializeResources();
         }
@@ -53,7 +53,7 @@ public class Resources {
     private static void initializeResources() {
         try {
             resources = new Resources();
-            String environmentSetting = System.getProperty("de.aspera.locapp.env");
+            String environmentSetting = System.getProperty("de.aspera.dataexporter.env");
 
             if (environmentSetting == null || environmentSetting.length() == 0) {
                 environmentSetting = "dev";
@@ -89,11 +89,11 @@ public class Resources {
                 SecureRandom random = new SecureRandom();
                 final String dbPassword = new BigInteger(130, random).toString(32);
 
-                systemProperties.put("db-user", "locapp");
+                systemProperties.put("db-user", "dataexporter");
                 systemProperties.put("db-password", dbPassword);
-                systemProperties.put("db-name", "locapp-db");
+                systemProperties.put("db-name", "dataexporter-db");
                 systemProperties.put("userPath", filePath);
-                systemProperties.store(fileOut, "locapp Application Config");
+                systemProperties.store(fileOut, "dataexporter Application Config");
                 fileOut.close();
             }
             resources.systemProperties.load(new FileInputStream(fileName));

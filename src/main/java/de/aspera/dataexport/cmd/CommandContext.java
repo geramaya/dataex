@@ -23,8 +23,12 @@ public class CommandContext {
     private CommandContext() {
     }
 
-    public void executeCommand(String command) throws Throwable {
-        ((CommandRunnable) commandMap.get(command).newInstance()).run();
+    public void executeCommand(String command) throws CommandException {
+        try {
+			((CommandRunnable) commandMap.get(command).newInstance()).run();
+		} catch (InstantiationException | IllegalAccessException e) {
+			throw new CommandException(e.getMessage(), e);
+		}
         clearArguments();
     }
 
@@ -74,8 +78,8 @@ public class CommandContext {
         addCommand("help", HelpCommand.class);
         addCommand("init", ConfigInitCommand.class);
         addCommand("i", ConfigInitCommand.class);
-        addCommand("e", ExportTableDatasetCommand.class);
-        addCommand("export", ExportTableDatasetCommand.class);
+        addCommand("e", ExportDatasetCommand.class);
+        addCommand("export", ExportDatasetCommand.class);
         addCommand("import", ImportDatasetCommand.class);
         addCommand("im", ImportDatasetCommand.class);
     }

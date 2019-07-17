@@ -67,7 +67,7 @@ public class JsonConnectionRepoTest {
 			JsonDatabase conn = gson.fromJson(connectionDetails, JsonDatabase.class);
 			connectionRepo.parseJsonConnection(conn);
 		}
-		assertEquals("Wrong number of saved Connections", 6, connectionRepo.getAllJsonDatabases().size());
+		assertEquals("Wrong number of saved Connections", 6, connectionRepo.getNumberOfJsonDatabases());
 	}
 
 }

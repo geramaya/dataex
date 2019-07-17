@@ -84,8 +84,8 @@ public final class JsonConnectionHolder {
 		}
 	}
 
-	public Map<String, JsonDatabase> getAllJsonDatabases() {
-		return dbConnections;
+	public int getNumberOfJsonDatabases() {
+		return dbConnections.size();
 	}
 
 	public JsonDatabase getJsonDatabases(String ident) {
