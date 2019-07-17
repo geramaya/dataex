@@ -53,7 +53,7 @@ public class MainStart {
             // Start the program with init parameters (e.g. blacklist for import
             // filenames)
             CommandContext.getInstance().executeCommand("init");
-        } catch (Exception e) {
+        } catch ( Throwable e) {
             logger.log(Level.SEVERE, e.getMessage(), e);
             System.exit(0);
         }
@@ -80,11 +80,10 @@ public class MainStart {
         if (CommandContext.getInstance().isCommand(cmd)) {
             try {
                 CommandContext.getInstance().executeCommand(cmd);
-            } catch (InstantiationException | IllegalAccessException e) {
+            } catch ( Throwable e) {
                 logger.log(Level.SEVERE, e.getMessage(), e);
-            }
-            finally {
-            	System.out.println("\n");
+                CommandContext.getInstance().clearArguments();
+                System.out.println("\n");
             	promptCLI();
             }
         } else {

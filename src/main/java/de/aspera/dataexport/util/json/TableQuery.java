@@ -30,7 +30,7 @@ public class TableQuery {
 		this.whereCondition = whereCondition;
 	}
 
-	public String getOrderByClaus() {
+	public String getOrderByCondition() {
 		return orderByCondition;
 	}
 

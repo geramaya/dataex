@@ -23,7 +23,7 @@ public class CommandContext {
     private CommandContext() {
     }
 
-    public void executeCommand(String command) throws InstantiationException, IllegalAccessException {
+    public void executeCommand(String command) throws Throwable {
         ((CommandRunnable) commandMap.get(command).newInstance()).run();
         clearArguments();
     }
@@ -76,5 +76,7 @@ public class CommandContext {
         addCommand("i", ConfigInitCommand.class);
         addCommand("e", ExportTableDatasetCommand.class);
         addCommand("export", ExportTableDatasetCommand.class);
+        addCommand("import", ImportDatasetCommand.class);
+        addCommand("im", ImportDatasetCommand.class);
     }
 }

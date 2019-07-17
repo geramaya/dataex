@@ -13,7 +13,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.dbunit.DatabaseUnitException;
 
-import de.aspera.dataexport.main.MainStart;
 import de.aspera.dataexport.util.ExporterController;
 import de.aspera.dataexport.util.json.ExportJsonCommand;
 import de.aspera.dataexport.util.json.ExportJsonCommandHolder;
@@ -30,64 +29,52 @@ public class ExportTableDatasetCommand implements CommandRunnable {
 	private ExportJsonCommandHolder commandRepo;
 	private CommandContext cmdContext;
 	private ByteArrayOutputStream exportStream;
+
 	public ExportTableDatasetCommand newInstance() {
 		return new ExportTableDatasetCommand();
 	}
 
 	@Override
-	public void run() {
-
-		try {
-			init();
-		} catch (JsonConnectionReadException | ImportJsonCommandException | IOException e) {
-			LOGGER.log(Level.SEVERE, e.getMessage(), e);
-			System.out.println("\n");
-			MainStart.promptCLI();
-		}
-
+	public void run() throws ImportJsonCommandException, JsonConnectionReadException, IOException, DatabaseUnitException, SQLException {
+		init();
 	}
 
-	private void init() throws JsonConnectionReadException, ImportJsonCommandException, IOException {
+	private void init() throws JsonConnectionReadException, ImportJsonCommandException, IOException, DatabaseUnitException, SQLException {
 		ExporterController.readJsonDatabaseFile();
 		ExporterController.readJsonCommandsFile();
 		connectionRepo = JsonConnectionHolder.getInstance();
 		cmdContext = CommandContext.getInstance();
 		commandRepo = ExportJsonCommandHolder.getInstance();
 		String commandId = cmdContext.nextArgument();
-		
+
 		if (StringUtils.isEmpty(commandId)) {
 			LOGGER.log(Level.WARNING, "A commandId is required to proceed!");
 			return;
 		}
-		
+
 		exportCommand = commandRepo.getCommand(commandId);
 		if (exportCommand == null) {
 			LOGGER.log(Level.WARNING, "Your commandId:\"{0}\" could not found!", commandId);
 			return;
 		}
-		
+
 		dataConnection = connectionRepo.getJsonDatabases(exportCommand.getConnId());
 		FileOutputStream fileOut = null;
-		try {
-			File file;
-			exportStream = ExporterController.startExportForTable(dataConnection, exportCommand);
-			if(SystemUtils.IS_OS_WINDOWS) {
-				file = new File(exportCommand.getExportedFilePath().concat("\\DataSet-Table-"+exportCommand.getCommandId()+"-"+dataConnection.getIdent()+".xml"));
-			}else  {
-				file = new File(exportCommand.getExportedFilePath().concat("/DataSet-Table-"+exportCommand.getCommandId()+"-"+dataConnection.getIdent()+".xml"));
-			}
-			fileOut = new FileOutputStream(file);
-			exportStream.writeTo(fileOut);
-		} catch (DatabaseUnitException | SQLException | IOException e) {
-			LOGGER.log(Level.SEVERE, e.getMessage(), e);
-			System.out.println("\n");
-			MainStart.promptCLI();
-		} finally {
-			if (exportStream != null)
-				IOUtils.closeQuietly(exportStream);
-			if (fileOut != null)
-				IOUtils.closeQuietly(fileOut);
+		File file;
+		exportStream = ExporterController.startExportForTable(dataConnection, exportCommand);
+		if (SystemUtils.IS_OS_WINDOWS) {
+			file = new File(exportCommand.getExportedFilePath().concat(
+					"\\DataSet-Table-" + exportCommand.getCommandId() + "-" + dataConnection.getIdent() + ".xml"));
+		} else {
+			file = new File(exportCommand.getExportedFilePath().concat(
+					"/DataSet-Table-" + exportCommand.getCommandId() + "-" + dataConnection.getIdent() + ".xml"));
 		}
+		fileOut = new FileOutputStream(file);
+		exportStream.writeTo(fileOut);
+		if (exportStream != null)
+			IOUtils.closeQuietly(exportStream);
+		if (fileOut != null)
+			IOUtils.closeQuietly(fileOut);
 	}
 
 }

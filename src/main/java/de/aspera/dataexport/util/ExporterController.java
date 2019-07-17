@@ -41,8 +41,8 @@ public class ExporterController {
 		for (TableQuery table : exportCommand.getTables()) {
 			TableDescriptor descriptor = new TableDescriptor(table.getTableName());
 			descriptor.setSchemaName(databaseConnection.getDbSchema());
-			if (table.getOrderByClaus() != null)
-				descriptor.setOrderByClause(table.getOrderByClaus());
+			if (table.getOrderByCondition() != null)
+				descriptor.setOrderByClause(table.getOrderByCondition());
 			if (table.getWhereCondition() != null)
 				descriptor.setWhereClause(table.getWhereCondition());
 			if (!table.getColumns().isEmpty())
