@@ -2,14 +2,18 @@ package de.aspera.dataexport.cmd;
 
 import java.io.FileInputStream;
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.dbunit.DatabaseUnitException;
+import org.dbunit.database.DatabaseConfig;
 import org.dbunit.database.DatabaseConnection;
+import org.dbunit.database.DefaultMetadataHandler;
 import org.dbunit.database.IDatabaseConnection;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
+import org.dbunit.ext.mysql.MySqlMetadataHandler;
 import org.dbunit.operation.DatabaseOperation;
 
 import de.aspera.dataexport.util.JDBCConnection;
@@ -62,10 +66,18 @@ public class ImportDatasetCommand implements CommandRunnable {
 	 * @return
 	 * @throws DatabaseUnitException
 	 */
-	private IDatabaseConnection getConnection(JsonDatabase databaseConnection) throws DatabaseUnitException {
+	private IDatabaseConnection getConnection(JsonDatabase databaseConnection)
+			throws DatabaseUnitException, SQLException {
 		Connection conn = JDBCConnection.getConnection(databaseConnection.getDbUrl(), databaseConnection.getDbUser(),
 				databaseConnection.getDbPassword());
-		return new DatabaseConnection(conn, databaseConnection.getDbSchema());
+		DatabaseConnection connection = new DatabaseConnection(conn, databaseConnection.getDbSchema());
+		DatabaseConfig config = connection.getConfig();
+		if(dataConnection.getDbUrl().contains("mysql")) {
+			config.setProperty(DatabaseConfig.PROPERTY_METADATA_HANDLER, new MySqlMetadataHandler());
+		}else {
+			config.setProperty(DatabaseConfig.PROPERTY_METADATA_HANDLER, new DefaultMetadataHandler());
+		}
+		return connection;
 
 	}
 
