@@ -53,10 +53,11 @@ public class HelpCommand implements CommandRunnable {
 
 	private void runWithoutArguments() {
 		System.out.println("List of commands: \n");
-		System.out.println("\t(q)quit: \t\t\t\tQuit the program.");
-		System.out.println("\t(e)export cmd-id\t\t\tCommand-Id of configure export commands");
-		System.out.println("\tCommand options mandatory: \t\tCommand parameters without brackets are mandatory");
-		System.out.println("\tCommand options optional: \t\tCommand parameters inside brackets are optional\n");
+		System.out.println("\t(q)quit: \t\t\t\t\tQuit the program.");
+		System.out.println("\t(e)export cmd-id\t\t\t\tCommand-Id of configure export commands");
+		System.out.println("\t(im)import [-c] path_to_file database_ident\tImport a dbunit xml file into a database.");
+		System.out.println("\tCommand options mandatory: \t\t\tCommand parameters without brackets are mandatory");
+		System.out.println("\tCommand options optional: \t\t\tCommand parameters inside brackets are optional\n");
 		System.out.println("\tFor more details about a command type: help [command, list-cmd]");
 		System.out.println("\t(h)elp: \t\t\t\tPrint this!\n\n");
 	}

@@ -116,12 +116,6 @@
 			<artifactId>gson</artifactId>
 			<version>2.3</version>
 		</dependency>
-		<!-- Test Data generators (Choose one) -->
-		<dependency>
-			<groupId>net.andreinc.mockneat</groupId>
-			<artifactId>mockneat</artifactId>
-			<version>0.3.6</version>
-		</dependency>
 		<dependency>
 			<groupId>com.github.javafaker</groupId>
 			<artifactId>javafaker</artifactId>
