@@ -64,5 +64,4 @@ public class DatasetReader {
 	public Object getValueInTable(String tableName, int row, String colName) throws DataSetException {
 		return tablesMap.get(tableName).getValue(row, colName);
 	}
-
 }
