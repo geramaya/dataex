@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.aspera</groupId>
@@ -76,9 +77,9 @@
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/com.microsoft.sqlserver/mssql-jdbc -->
 		<dependency>
-    		<groupId>com.microsoft.sqlserver</groupId>
-    		<artifactId>mssql-jdbc</artifactId>
-    		<version>7.2.1.jre8</version>
+			<groupId>com.microsoft.sqlserver</groupId>
+			<artifactId>mssql-jdbc</artifactId>
+			<version>7.2.1.jre8</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.jdbi/jdbi3 -->
 		<dependency>
@@ -120,6 +121,14 @@
 			<groupId>com.github.javafaker</groupId>
 			<artifactId>javafaker</artifactId>
 			<version>0.15</version>
+		</dependency>
+		<!-- Groovy dependencies -->
+		<!-- https://mvnrepository.com/artifact/org.codehaus.groovy/groovy-all -->
+		<dependency>
+			<groupId>org.codehaus.groovy</groupId>
+			<artifactId>groovy-all</artifactId>
+			<version>2.5.6</version>
+			<type>pom</type>
 		</dependency>
 	</dependencies>
 	<!-- Mockneat repository -->
@@ -171,6 +180,18 @@
 						</goals>
 					</execution>
 				</executions>
+			</plugin>
+			<!-- GMaven for Groovy Builds -->
+			<plugin>
+				<groupId>org.codehaus.gmaven</groupId>
+				<artifactId>groovy-maven-plugin</artifactId>
+				<dependencies>
+					<dependency>
+						<groupId>org.codehaus.groovy</groupId>
+						<artifactId>groovy-all</artifactId>
+						<version>2.5.6</version>
+					</dependency>
+				</dependencies>
 			</plugin>
 		</plugins>
 	</build>
