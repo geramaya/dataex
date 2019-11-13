@@ -1,6 +1,7 @@
 package de.aspera.dataexport.util.dataset.editor;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,7 +21,7 @@ public class DatasetReader {
 	public DatasetReader() {
 	}
 
-	public void readDataset(String filePath) throws Exception {
+	public void readDataset(String filePath) throws DataSetException, FileNotFoundException, DatasetReaderException  {
 		this.dataset = new FlatXmlDataSetBuilder().build(new FileInputStream(filePath));
 		buildTableMap();
 	}
@@ -46,10 +47,9 @@ public class DatasetReader {
 		}
 		return colNames;
 	}
-	private void buildTableMap() throws Exception {
+	private void buildTableMap() throws DatasetReaderException, DataSetException {
 		if (dataset == null) {
-			//Hier muss noch angepasst
-			throw new Exception();
+			throw new DatasetReaderException("Dataset is null.");
 		}
 		tablesMap = new HashMap<String, ITable>();
 		String[] tableNames = dataset.getTableNames();
