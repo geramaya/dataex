@@ -35,4 +35,21 @@ public class DatasetMultiplier {
 		}
 		return bigDataset;
 	}
+
+	public IDataSet multiplyRowInTable(String tableName, int row, int factor) throws DataSetException {
+		DefaultDataSet bigDataset = new DefaultDataSet();
+		DefaultTable bigTable = new DefaultTable(reader.getMetaDataOfTable(tableName));
+		for (int y = 0; y < factor; y++) {
+			List<String> colNames = reader.getColumnNamesOfTable(tableName);
+			Object[] valuesOfRow = new Object[colNames.size()];
+			int j = 0;
+			for (String colName : colNames) {
+				valuesOfRow[j] = reader.getValueInTable(tableName, row, colName);
+				j++;
+			}
+			bigTable.addRow(valuesOfRow);
+		}
+		bigDataset.addTable(bigTable);
+		return bigDataset;
+	}
 }
