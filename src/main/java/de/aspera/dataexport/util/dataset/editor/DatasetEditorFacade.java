@@ -1,10 +1,14 @@
 package de.aspera.dataexport.util.dataset.editor;
 
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
 import org.dbunit.dataset.DataSetException;
+import org.dbunit.dataset.IDataSet;
+import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
 
 public class DatasetEditorFacade {
 	private DatasetReader reader;
@@ -19,6 +23,11 @@ public class DatasetEditorFacade {
 
 	public void readDataset(String filePath) throws DataSetException, FileNotFoundException, DatasetReaderException {
 		reader.readDataset(filePath);
+	}
+	
+	public void readDataset(FileInputStream stream) throws DataSetException, DatasetReaderException, IOException, ClassNotFoundException {
+		IDataSet dataset = new FlatXmlDataSetBuilder().build(stream);
+		reader.setDataset(dataset);
 	}
 
 	public List<String> getTabelNames() throws DataSetException {
