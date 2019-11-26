@@ -22,7 +22,7 @@ import de.aspera.dataexport.util.json.JsonDatabase;
 /**
  * Use this to export data from database to a flat XML data set..
  * 
- * @author Petr Stastny
+ * @author Ahmed Osman
  * 
  */
 public class DataSetExporter {
