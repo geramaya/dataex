@@ -2,6 +2,7 @@ package de.aspera.dataexport.util;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +18,7 @@ import de.aspera.dataexport.util.json.JsonDatabase;
 import de.aspera.dataexport.util.json.TableQuery;
 
 public class ExporterController {
+	private static DataSetExporter exporter;
 
 	/**
 	 * Get a buffered output stream to transform data or persist on the filesystem.
@@ -37,7 +39,7 @@ public class ExporterController {
 		List<TableDescriptor> descriptors = new ArrayList<>();
 		if (databaseConnection == null)
 			throw new IllegalArgumentException("The databaseConnection can not be null");
-		DataSetExporter exporter = new DataSetExporter(databaseConnection);
+		exporter = new DataSetExporter(databaseConnection);
 		for (TableQuery table : exportCommand.getTables()) {
 			TableDescriptor descriptor = new TableDescriptor(table.getTableName());
 			descriptor.setSchemaName(databaseConnection.getDbSchema());
@@ -64,5 +66,10 @@ public class ExporterController {
 		ExportJsonCommandHolder.getInstance().importJsonCommands();
 		
 	}
+	
+	public static Connection getConnection() {
+		return exporter.getConnection();
+	}
+	
 
 }

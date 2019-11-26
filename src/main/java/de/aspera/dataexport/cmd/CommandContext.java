@@ -82,5 +82,7 @@ public class CommandContext {
         addCommand("export", ExportDatasetCommand.class);
         addCommand("import", ImportDatasetCommand.class);
         addCommand("im", ImportDatasetCommand.class);
+        addCommand("exEd", ExportAndEditDatasetCommand.class);
+        addCommand("exportEdit", ExportAndEditDatasetCommand.class);
     }
 }
