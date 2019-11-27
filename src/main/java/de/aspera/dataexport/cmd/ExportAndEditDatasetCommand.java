@@ -42,6 +42,8 @@ public class ExportAndEditDatasetCommand implements CommandRunnable {
 	private ByteArrayOutputStream exportStream;
 	private GroovyReader groovyReader;
 	private File file;
+	private FileOutputStream fileOut;
+	private FileInputStream inputStream;
 
 	@Override
 	public void run() throws CommandException {
@@ -78,7 +80,6 @@ public class ExportAndEditDatasetCommand implements CommandRunnable {
 			return;
 		}
 		dataConnection = connectionRepo.getJsonDatabases(exportCommand.getConnId());
-
 		try {
 			exportStream = ExporterController.startExportForTable(dataConnection, exportCommand);
 
@@ -89,34 +90,36 @@ public class ExportAndEditDatasetCommand implements CommandRunnable {
 				file = new File(exportCommand.getExportedFilePath().concat(
 						"/DataSet-Table-" + exportCommand.getCommandId() + "-" + dataConnection.getIdent() + ".xml"));
 			}
-			FileOutputStream fileOut = new FileOutputStream(file);
+			fileOut = new FileOutputStream(file);
 			exportStream.writeTo(fileOut);
+		} catch (DatabaseUnitException | SQLException | IOException e) {
+			throw new CommandException(e.getMessage(), e);
+		} finally{
 			if (exportStream != null)
 				IOUtils.closeQuietly(exportStream);
 			if (fileOut != null)
 				IOUtils.closeQuietly(fileOut);
-		} catch (DatabaseUnitException | SQLException | IOException e) {
-			throw new CommandException(e.getMessage(), e);
 		}
 	}
 
 	private void startEditingDataset() throws CommandException {
 		try {
-			FileInputStream inputStream = new FileInputStream(file);
+			inputStream = new FileInputStream(file);
 			editorFacade.readDataset(inputStream);
 			groovyReader = new GroovyReader();
 			editorFacade.setConnectionOfDB(ExporterController.getConnection());
 			groovyReader.executeGroovyScript(editorFacade);
 			// Write results Back to file
-			FileOutputStream fileOut = new FileOutputStream(file);
+			fileOut = new FileOutputStream(file);
 			FlatXmlDataSet.write(editorFacade.getDataSet(), fileOut);
+		} catch (DataSetException | ClassNotFoundException | DatasetReaderException | IOException
+				| GroovyReaderException | ResourceException | ScriptException e) {
+			throw new CommandException(e.getMessage(), e);
+		}finally {
 			if (inputStream != null)
 				IOUtils.closeQuietly(inputStream);
 			if (fileOut != null)
 				IOUtils.closeQuietly(fileOut);
-		} catch (DataSetException | ClassNotFoundException | DatasetReaderException | IOException
-				| GroovyReaderException | ResourceException | ScriptException e) {
-			throw new CommandException(e.getMessage(), e);
 		}
 
 	}
