@@ -8,7 +8,6 @@ import java.util.logging.Logger;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang3.SystemUtils;
 
 import de.aspera.dataexport.util.ExporterController;
 import de.aspera.dataexport.util.json.ExportJsonCommand;
@@ -55,13 +54,8 @@ public class ExportDatasetCommand implements CommandRunnable {
 			FileOutputStream fileOut = null;
 			File file;
 			exportStream = ExporterController.startExportForTable(dataConnection, exportCommand);
-			if (SystemUtils.IS_OS_WINDOWS) {
-				file = new File(exportCommand.getExportedFilePath().concat(
-						"\\DataSet-Table-" + exportCommand.getCommandId() + "-" + dataConnection.getIdent() + ".xml"));
-			} else {
-				file = new File(exportCommand.getExportedFilePath().concat(
-						"/DataSet-Table-" + exportCommand.getCommandId() + "-" + dataConnection.getIdent() + ".xml"));
-			}
+			file = new File(exportCommand.getExportedFilePath().concat(
+						File.separator +"DataSet-Table-" + exportCommand.getCommandId() + "-" + dataConnection.getIdent() + ".xml"));
 			fileOut = new FileOutputStream(file);
 			exportStream.writeTo(fileOut);
 			if (exportStream != null)

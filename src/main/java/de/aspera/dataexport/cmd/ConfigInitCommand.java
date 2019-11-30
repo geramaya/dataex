@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.apache.commons.lang3.SystemUtils;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -65,17 +63,14 @@ public class ConfigInitCommand implements CommandRunnable {
 		List<JsonDatabase> jsonConnections = new ArrayList<>();
 
 		// Write Connection file
-		if (SystemUtils.IS_OS_WINDOWS) {
-			filePath = System.getProperty("user.home") + "\\." + PROJECT_NAME + "\\dataExporter_Connections.json";
-		} else {
-			filePath = System.getProperty("user.home") + "/." + PROJECT_NAME + "dataExporter_Connections.json";
-		}
+		filePath = System.getProperty("user.home") + File.separator + "." + PROJECT_NAME + File.separator
+				+ "dataExporter_Connections.json";
 		file = new File(filePath);
-		if(!file.exists()) {
+		if (!file.exists()) {
 			fileWriter = new FileWriter(file);
-			for(int i=0;i<2;i++) {
+			for (int i = 0; i < 2; i++) {
 				JsonDatabase jsonDB = new JsonDatabase();
-				jsonDB.setIdent("uniqe-connection-Id-"+i);
+				jsonDB.setIdent("uniqe-connection-Id-" + i);
 				jsonDB.setDbDriver("Db-Driver");
 				jsonDB.setDbPassword("root");
 				jsonDB.setDbSchema("schema-1");
@@ -87,21 +82,16 @@ public class ConfigInitCommand implements CommandRunnable {
 			fileWriter.close();
 		}
 		// Write Command file
-		if (SystemUtils.IS_OS_WINDOWS) {
-			filePath = System.getProperty("user.home") + "\\." + Resources.PROJECT_NAME
-					+ "\\dataExporter_ExportCommands.json";
-		} else {
-			filePath = System.getProperty("user.home") + "/." + Resources.PROJECT_NAME
-					+ "dataExporter_ExportCommands.json";
-		}
+		filePath = System.getProperty("user.home") + File.separator + "." + Resources.PROJECT_NAME
+				+ File.separator + "dataExporter_ExportCommands.json";
 		file = new File(filePath);
-		if(!file.exists()) {
+		if (!file.exists()) {
 			fileWriter = new FileWriter(file);
-			for(int i=0;i<2;i++) {
+			for (int i = 0; i < 2; i++) {
 				ExportJsonCommand command = new ExportJsonCommand();
-				command.setConnId("uniqe-connection-Id-"+i);
+				command.setConnId("uniqe-connection-Id-" + i);
 				command.setTables(tablesList);
-				command.setCommandId("uniqe-command-Id-"+i);
+				command.setCommandId("uniqe-command-Id-" + i);
 				command.setExportedFilePath(System.getProperty("user.home"));
 				for (int j = 0; j < 2; j++) {
 					TableQuery tab = new TableQuery();
