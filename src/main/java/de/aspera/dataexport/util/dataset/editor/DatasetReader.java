@@ -2,6 +2,7 @@ package de.aspera.dataexport.util.dataset.editor;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +22,7 @@ import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
 public class DatasetReader {
 	private IDataSet dataset;
 	private Map<String, ITable> tablesMap;
+	private TableKeysInvestigator tableInvestigator;
 
 	public void readDataset(String filePath) throws DataSetException, FileNotFoundException, DatasetReaderException {
 		this.dataset = new FlatXmlDataSetBuilder().build(new FileInputStream(filePath));
@@ -83,8 +85,8 @@ public class DatasetReader {
 		DefaultTable table = new DefaultTable(getMetaDataOfTable(tableName));
 		// Copy Old table
 		for (int oldrow = 0; oldrow < getRowCountOfTable(tableName); oldrow++) {
+			table.addRow();
 			for (String colName : getColumnNamesOfTable(tableName)) {
-				table.addRow();
 				table.setValue(oldrow, colName, getValueInTable(tableName, oldrow, colName));
 			}
 		}
@@ -99,13 +101,21 @@ public class DatasetReader {
 				editedDataSet.addTable(dataset.getTable(name));
 			}
 		}
-		setDataset(editedDataSet);
 		return editedDataSet;
 	}
 
-	public IDataSet addRow(String tableName, Map<String, String> newValuesColName)
-			throws RowOutOfBoundsException, NoSuchColumnException, DataSetException, DatasetReaderException {
+	public IDataSet addRow(String tableName, Map<String, String> newValuesColName) throws RowOutOfBoundsException,
+			NoSuchColumnException, DataSetException, DatasetReaderException, SQLException {
 		DefaultTable table = new DefaultTable(getMetaDataOfTable(tableName));
+		if (tableInvestigator != null) {
+			Map<String, String> tableColKeys = tableInvestigator.getPrimarykeysOfTable(tableName);
+			// get primary Keys of the Table and update the Values in the Map of Values
+			for (String key : tableColKeys.keySet()) {
+				String colName = key.split(",")[1];
+				newValuesColName.put(colName, tableInvestigator.getValidPrimaryKeyValue(tableName, colName));
+			}
+		}
+
 		// Copy Old table
 		for (int row = 0; row < getRowCountOfTable(tableName); row++) {
 			table.addRow();
@@ -128,7 +138,26 @@ public class DatasetReader {
 				editedDataSet.addTable(dataset.getTable(name));
 			}
 		}
-		setDataset(editedDataSet);
 		return editedDataSet;
+	}
+
+	public int getMaxNumberinColumnFromDataSet(String tableName, String colName) throws DataSetException {
+		int numberOfRows = getRowCountOfTable(tableName);
+		int maxNum = 0;
+		for (int i = 0; i < numberOfRows; i++) {
+			int currentValue = (int) getValueInTable(tableName, i, colName);
+			if (currentValue > maxNum)
+				maxNum = currentValue;
+		}
+		return maxNum;
+	}
+
+	public IDataSet getDataSet() {
+		return dataset;
+	}
+
+	public void setTableKeyInvestigator(TableKeysInvestigator tableInvestigator) {
+		this.tableInvestigator = tableInvestigator;
+
 	}
 }

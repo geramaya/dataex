@@ -2,6 +2,8 @@ package de.aspera.dataexport.util.dataset.editor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.sql.SQLException;
+
 import org.dbunit.dataset.Column;
 import org.dbunit.dataset.DataSetException;
 import org.dbunit.dataset.DefaultDataSet;
@@ -34,11 +36,11 @@ public class DatasetMultiplierTest {
 	}
 
 	@Test
-	public void testMultiplyAllTable() throws DataSetException {
+	public void testMultiplyAllTable() throws DataSetException, SQLException {
 		IDataSet newDataset = multiplier.multiplyData(4);
-		assertEquals(4, newDataset.getTable("test-table").getRowCount(), "Wrong number of Rows");
+		assertEquals(5, newDataset.getTable("test-table").getRowCount(), "Wrong number of Rows");
 		Column[] cols = newDataset.getTable("test-table").getTableMetaData().getColumns();
-		for (int i = 0; i < 4; i++) {
+		for (int i = 0; i < 5; i++) {
 			for (int j = 0; j < cols.length; j++) {
 				int colVal = j + 1;
 				assertEquals("val" + colVal, newDataset.getTable("test-table").getValue(i, cols[j].getColumnName()));
@@ -48,11 +50,11 @@ public class DatasetMultiplierTest {
 	}
 	
 	@Test
-	public void testMultiplyRowInTable() throws DataSetException {
+	public void testMultiplyRowInTable() throws DataSetException, SQLException {
 		IDataSet newDataset = multiplier.multiplyRowInTable("test-table", 0, 5);
-		assertEquals(5, newDataset.getTable("test-table").getRowCount(), "Wrong number of Rows");
+		assertEquals(6, newDataset.getTable("test-table").getRowCount(), "Wrong number of Rows");
 		Column[] cols = newDataset.getTable("test-table").getTableMetaData().getColumns();
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < 6; i++) {
 			for (int j = 0; j < cols.length; j++) {
 				int colVal = j + 1;
 				assertEquals("val" + colVal, newDataset.getTable("test-table").getValue(i, cols[j].getColumnName()));
