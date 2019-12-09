@@ -15,11 +15,11 @@ public class DataFaker {
 	public  String fakeNumber() {
 		return null;
 	}
-	public  String fakeString(int maxLength) {
-		return faker.regexify("[a-zA-Z]{3,"+maxLength+"}$");
-	}
-	public  String fakeStringWithLength(int length) {
+	public  String fakeString() {
 		return null;
+	}
+	public  String fakeStringWithLength(int maxLength) {
+		return faker.regexify("[a-zA-Z]{3,"+maxLength+"}$");
 	}
 	public  String fakeNumberWithinRange(int firstNum, int secondNum) {
 		return "fakeNum called";
