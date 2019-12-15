@@ -16,9 +16,9 @@ public class TableKeysInvestigator {
 	private DatabaseMetaData metaData;
 	private Connection conn;
 	private Map<String, String> keyTypeMap;
-	private Map<String,Integer> numericKeyValueMap;
-	private Map<String,Set<String>> strKeyValueMap;
-	private static final DataFaker faker = new DataFaker(); 
+	private Map<String, Integer> numericKeyValueMap;
+	private Map<String, Set<String>> strKeyValueMap;
+	private static final DataFaker faker = new DataFaker();
 
 	public void setConnection(Connection conn) {
 		this.conn = conn;
@@ -38,15 +38,17 @@ public class TableKeysInvestigator {
 	public void setMetaData(DatabaseMetaData metaData) {
 		this.metaData = metaData;
 	}
-	
+
 	public Map<String, String> getPrimarykeysOfTable(String tableName) throws SQLException {
-		keyTypeMap = new HashMap<String, String>();
+		if (keyTypeMap == null) {
+			keyTypeMap = new HashMap<String, String>();
+		}
 		ResultSet keySet = metaData.getPrimaryKeys(null, null, tableName);
 		while (keySet.next()) {
 			String colName = keySet.getString("COLUMN_NAME");
 			ResultSet column = metaData.getColumns(null, null, tableName, colName);
 			column.next();
-			keyTypeMap.put(tableName+","+keySet.getString("COLUMN_NAME"),
+			keyTypeMap.put(tableName + "," + keySet.getString("COLUMN_NAME"),
 					column.getString("TYPE_NAME") + "," + column.getString("COLUMN_SIZE"));
 		}
 
@@ -69,32 +71,32 @@ public class TableKeysInvestigator {
 	}
 
 	public String getValidPrimaryKeyValue(String tableName, String colName) throws SQLException {
-		if(keyTypeMap==null) {
+		if (keyTypeMap == null || !keyTypeMap.containsKey(tableName + "," + colName)) {
 			getPrimarykeysOfTable(tableName);
 		}
-		String typeOfKey = keyTypeMap.get(tableName+","+colName);
-		if(typeOfKey.toLowerCase().contains("number")|| typeOfKey.toLowerCase().contains("int") ) {
-			return getNextValidNumber(tableName,colName);
-		}else {
-			return getNextValidString(tableName,colName, typeOfKey);
+		String typeOfKey = keyTypeMap.get(tableName + "," + colName);
+		if (typeOfKey.toLowerCase().contains("number") || typeOfKey.toLowerCase().contains("int")) {
+			return getNextValidNumber(tableName, colName);
+		} else {
+			return getNextValidString(tableName, colName, typeOfKey);
 		}
 	}
 
 	private String getNextValidString(String tableName, String colName, String typeOfKey) throws SQLException {
 		String validStr;
 		Set<String> valuesSet;
-		if(strKeyValueMap==null) {
+		if (strKeyValueMap == null) {
 			strKeyValueMap = new HashMap<String, Set<String>>();
 		}
-		if(!strKeyValueMap.containsKey(tableName+","+ colName)) {
+		if (!strKeyValueMap.containsKey(tableName + "," + colName)) {
 			Set<String> setOfAllStrValues = getAllCharValuesInColumnFromDB(tableName, colName);
-			strKeyValueMap.put(tableName+","+ colName, setOfAllStrValues);
+			strKeyValueMap.put(tableName + "," + colName, setOfAllStrValues);
 		}
-		valuesSet=strKeyValueMap.get(tableName+","+ colName);
+		valuesSet = strKeyValueMap.get(tableName + "," + colName);
 		int strLength = Integer.parseInt(typeOfKey.split(",")[1]);
 		validStr = faker.fakeStringWithLength(strLength);
-		while(!valuesSet.add(validStr)){
-			//TODO: make the implementation of the faker better
+		while (!valuesSet.add(validStr)) {
+			// TODO: make the implementation of the faker better
 			validStr = faker.fakeStringWithLength(strLength);
 		}
 		return validStr;
@@ -114,17 +116,17 @@ public class TableKeysInvestigator {
 
 	private String getNextValidNumber(String tableName, String colName) throws SQLException {
 		int maxNumber;
-		if(numericKeyValueMap==null) {
+		if (numericKeyValueMap == null) {
 			numericKeyValueMap = new HashMap<String, Integer>();
 		}
-		if(!numericKeyValueMap.containsKey(tableName+","+colName)) {
+		if (!numericKeyValueMap.containsKey(tableName + "," + colName)) {
 			maxNumber = getMaxNumberValueInColFromDB(tableName, colName);
-			numericKeyValueMap.put(tableName+","+colName, maxNumber);
-		}else {
-			maxNumber = numericKeyValueMap.get(tableName+","+colName);			
+			numericKeyValueMap.put(tableName + "," + colName, maxNumber);
+		} else {
+			maxNumber = numericKeyValueMap.get(tableName + "," + colName);
 		}
 		maxNumber++;
-		numericKeyValueMap.put(tableName+","+colName, maxNumber);
+		numericKeyValueMap.put(tableName + "," + colName, maxNumber);
 		return Integer.toString(maxNumber);
 	}
 
