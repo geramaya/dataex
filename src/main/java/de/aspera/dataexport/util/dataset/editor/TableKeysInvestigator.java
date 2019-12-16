@@ -5,8 +5,10 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -128,6 +130,15 @@ public class TableKeysInvestigator {
 		maxNumber++;
 		numericKeyValueMap.put(tableName + "," + colName, maxNumber);
 		return Integer.toString(maxNumber);
+	}
+	
+	public List<String> getColumnNamesOfTable(String tableName) throws SQLException {
+		List<String> colNames = new ArrayList<String>();
+		ResultSet colNameSet = metaData.getColumns(null, null, tableName, null);
+		while (colNameSet.next()) {
+			colNames.add(colNameSet.getString("COLUMN_NAME"));
+		}
+		return colNames;
 	}
 
 }

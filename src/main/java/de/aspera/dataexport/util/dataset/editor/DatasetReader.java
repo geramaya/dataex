@@ -17,6 +17,7 @@ import org.dbunit.dataset.ITable;
 import org.dbunit.dataset.ITableMetaData;
 import org.dbunit.dataset.NoSuchColumnException;
 import org.dbunit.dataset.RowOutOfBoundsException;
+import org.dbunit.dataset.datatype.DataType;
 import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
 
 public class DatasetReader {
@@ -106,7 +107,19 @@ public class DatasetReader {
 
 	public IDataSet addRow(String tableName, Map<String, String> newValuesColName) throws RowOutOfBoundsException,
 			NoSuchColumnException, DataSetException, DatasetReaderException, SQLException {
-		DefaultTable table = new DefaultTable(getMetaDataOfTable(tableName));
+		DefaultTable table;
+		ITableMetaData metaData = getMetaDataOfTable(tableName);
+		//the table have no columns
+		if(metaData.getColumns().length==0 && tableInvestigator!=null) {
+			List<String> colNames = tableInvestigator.getColumnNamesOfTable(tableName);
+			Column[] cols = new Column[colNames.size()];
+			for(int i=0; i<colNames.size();i++) {
+				cols[i] = new Column(colNames.get(i), DataType.UNKNOWN);
+			}
+			table= new DefaultTable(tableName, cols);
+		}else {
+			table = new DefaultTable(metaData);
+		}
 		if (tableInvestigator != null) {
 			Map<String, String> tableColKeys = tableInvestigator.getPrimarykeysOfTable(tableName);
 			// get primary Keys of the Table and update the Values in the Map of Values
