@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import org.apache.commons.lang3.SystemUtils;
 import org.codehaus.groovy.control.CompilationFailedException;
 
 import de.aspera.dataexport.util.dataset.editor.DatasetEditorFacade;
@@ -37,11 +36,7 @@ public class GroovyReader {
 
 	private File getGroovyScriptFile() {
 		String filePath;
-		if (SystemUtils.IS_OS_WINDOWS) {
-			filePath = System.getProperty("user.home") + "\\." + PROJECT_NAME + "\\GroovyScript.groovy";
-		} else {
-			filePath = System.getProperty("user.home") + "/." + PROJECT_NAME + "/GroovyScript.groovy";
-		}
+		filePath = System.getProperty("user.home") + File.separator+"." + PROJECT_NAME + File.separator+"GroovyScript.groovy";
 		Path pathOfFile = Paths.get(filePath);
 		return pathOfFile.toFile();
 	}

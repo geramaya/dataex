@@ -1,8 +1,8 @@
 package de.aspera.dataexport.cmd;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -12,7 +12,6 @@ import java.util.logging.Logger;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang3.SystemUtils;
 import org.dbunit.DatabaseUnitException;
 import org.dbunit.dataset.DataSetException;
 import org.dbunit.dataset.xml.FlatXmlDataSet;
@@ -43,7 +42,7 @@ public class ExportAndEditDatasetCommand implements CommandRunnable {
 	private GroovyReader groovyReader;
 	private File file;
 	private FileOutputStream fileOut;
-	private FileInputStream inputStream;
+	private ByteArrayInputStream inputStream;
 
 	@Override
 	public void run() throws CommandException {
@@ -82,19 +81,9 @@ public class ExportAndEditDatasetCommand implements CommandRunnable {
 		dataConnection = connectionRepo.getJsonDatabases(exportCommand.getConnId());
 		try {
 			exportStream = ExporterController.startExportForTable(dataConnection, exportCommand);
-
-			if (SystemUtils.IS_OS_WINDOWS) {
-				file = new File(exportCommand.getExportedFilePath().concat(
-						"\\DataSet-Table-" + exportCommand.getCommandId() + "-" + dataConnection.getIdent() + ".xml"));
-			} else {
-				file = new File(exportCommand.getExportedFilePath().concat(
-						"/DataSet-Table-" + exportCommand.getCommandId() + "-" + dataConnection.getIdent() + ".xml"));
-			}
-			fileOut = new FileOutputStream(file);
-			exportStream.writeTo(fileOut);
-		} catch (DatabaseUnitException | SQLException | IOException e) {
+		} catch (DatabaseUnitException | SQLException e) {
 			throw new CommandException(e.getMessage(), e);
-		} finally{
+		} finally {
 			if (exportStream != null)
 				IOUtils.closeQuietly(exportStream);
 			if (fileOut != null)
@@ -104,18 +93,21 @@ public class ExportAndEditDatasetCommand implements CommandRunnable {
 
 	private void startEditingDataset() throws CommandException {
 		try {
-			inputStream = new FileInputStream(file);
+			// convert output to input stream without writing to the desk
+			inputStream = new ByteArrayInputStream(exportStream.toByteArray());
 			editorFacade.readDataset(inputStream);
 			groovyReader = new GroovyReader();
 			editorFacade.setConnectionOfDB(ExporterController.getConnection());
 			groovyReader.executeGroovyScript(editorFacade);
 			// Write results Back to file
+			file = new File(exportCommand.getExportedFilePath().concat(File.separator + "DataSet-Table-"
+					+ exportCommand.getCommandId() + "-" + dataConnection.getIdent() + ".xml"));
 			fileOut = new FileOutputStream(file);
 			FlatXmlDataSet.write(editorFacade.getDataSet(), fileOut);
 		} catch (DataSetException | ClassNotFoundException | DatasetReaderException | IOException
 				| GroovyReaderException | ResourceException | ScriptException e) {
 			throw new CommandException(e.getMessage(), e);
-		}finally {
+		} finally {
 			if (inputStream != null)
 				IOUtils.closeQuietly(inputStream);
 			if (fileOut != null)

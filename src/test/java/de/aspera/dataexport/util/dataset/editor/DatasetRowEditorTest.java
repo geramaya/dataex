@@ -1,9 +1,9 @@
 package de.aspera.dataexport.util.dataset.editor;
 
-import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,7 +39,7 @@ public class DatasetRowEditorTest {
 	}
 
 	@Test
-	public void testChangeValuesInTable() throws DataSetException, DatasetReaderException {
+	public void testChangeValuesInTable() throws DataSetException, DatasetReaderException, SQLException {
 		Map<String, String> newColNameValueMap = new HashMap<String, String>();
 		newColNameValueMap.put("val1Col", "newValCol1");
 		newColNameValueMap.put("val3Col", "newValCol3");
@@ -50,7 +50,7 @@ public class DatasetRowEditorTest {
 	}
 	
 	@Test
-	public void testAddRowToTable() throws DataSetException, DatasetReaderException {
+	public void testAddRowToTable() throws DataSetException, DatasetReaderException, SQLException {
 		Map<String, String> newColNameValueMap = new HashMap<String, String>();
 		newColNameValueMap.put("val1Col", "newValCol1");
 		newColNameValueMap.put("val3Col", "newValCol3");

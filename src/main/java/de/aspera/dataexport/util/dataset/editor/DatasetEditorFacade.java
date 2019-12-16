@@ -1,8 +1,10 @@
 package de.aspera.dataexport.util.dataset.editor;
 
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
@@ -14,18 +16,21 @@ public class DatasetEditorFacade {
 	private DatasetReader reader;
 	private DatasetMultiplier multiplier;
 	private DatasetRowEditor rowEditor;
+	private TableKeysInvestigator tableInvestigator;
 
 	public DatasetEditorFacade() {
 		this.reader = new DatasetReader();
 		this.multiplier = new DatasetMultiplier(reader);
 		this.rowEditor = new DatasetRowEditor(reader);
+		this.tableInvestigator = new TableKeysInvestigator();
 	}
 
 	public void readDataset(String filePath) throws DataSetException, FileNotFoundException, DatasetReaderException {
 		reader.readDataset(filePath);
 	}
-	
-	public void readDataset(FileInputStream stream) throws DataSetException, DatasetReaderException, IOException, ClassNotFoundException {
+
+	public void readDataset(InputStream stream)
+			throws DataSetException, DatasetReaderException, IOException, ClassNotFoundException {
 		IDataSet dataset = new FlatXmlDataSetBuilder().build(stream);
 		reader.setDataset(dataset);
 	}
@@ -50,23 +55,38 @@ public class DatasetEditorFacade {
 		return reader.getRowOfTable(tableName, row);
 	}
 
-	public void multiplyData(int factor) throws DataSetException, DatasetReaderException {
+	public void multiplyData(int factor) throws DataSetException, DatasetReaderException, SQLException {
 		reader.setDataset(multiplier.multiplyData(factor));
 	}
 
-	public void multiplyRowInTable(String tableName, int row, int factor)
-			throws DataSetException, DatasetReaderException {
+	public void multiplyRowInTable(String tableName, int row, int factor) throws DataSetException, DatasetReaderException, SQLException {
 		reader.setDataset(multiplier.multiplyRowInTable(tableName, row, factor));
+	}
+	
+	public void multiplyDataInTable(String tableName, int factor) throws DataSetException, DatasetReaderException, SQLException {
+		reader.setDataset(multiplier.multiplyDataInTable(tableName, factor));
 	}
 
 	public void changeValuesInRow(String tableName, int row, Map<String, String> newValuesColName)
-			throws DataSetException, DatasetReaderException {
+			throws DataSetException, DatasetReaderException, SQLException {
 		reader.setDataset(rowEditor.changeValuesInRow(tableName, row, newValuesColName));
 	}
 
 	public void addRow(String tableName, Map<String, String> newValuesColName)
-			throws DataSetException, DatasetReaderException {
+			throws DataSetException, DatasetReaderException, SQLException {
 		reader.setDataset(rowEditor.addRow(tableName, newValuesColName));
+	}
+
+	
+	public void setConnectionOfDB(Connection conn) {
+		tableInvestigator.setConnection(conn);
+		reader.setTableKeyInvestigator(tableInvestigator);
+		rowEditor.setTableKeyInvestigator(tableInvestigator);
+		multiplier.setTableKeyInvestigator(tableInvestigator);
+	}
+
+	public IDataSet getDataSet() {
+		return reader.getDataSet();
 	}
 
 }
