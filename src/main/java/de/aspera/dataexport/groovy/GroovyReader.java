@@ -10,8 +10,6 @@ import org.codehaus.groovy.control.CompilationFailedException;
 import de.aspera.dataexport.util.dataset.editor.DatasetEditorFacade;
 import groovy.lang.GroovyClassLoader;
 import groovy.lang.GroovyObject;
-import groovy.util.ResourceException;
-import groovy.util.ScriptException;
 
 public class GroovyReader {
 	public final static String PROJECT_NAME = "dataExporter";
@@ -19,17 +17,18 @@ public class GroovyReader {
 	private GroovyObject groovyObj;
 	private static final GroovyClassLoader classLoader = new GroovyClassLoader();
 
-	public GroovyReader() throws GroovyReaderException, CompilationFailedException, IOException {
+	public GroovyReader()  {
 		readGroovyScript();
 	}
 
-	private void readGroovyScript() throws GroovyReaderException {
+	private void readGroovyScript() {
 		script = getGroovyScriptFile();
 		try {
 			Class groovyClass = classLoader.parseClass(script);
 			groovyObj = (GroovyObject) groovyClass.newInstance();
 		} catch (InstantiationException | IllegalAccessException | CompilationFailedException | IOException e) {
-			throw new GroovyReaderException(e.getMessage());
+			GroovyReaderException ex = new GroovyReaderException(e.getMessage(), e);
+			ex.printStackTrace();
 		}
 
 	}
@@ -41,7 +40,7 @@ public class GroovyReader {
 		return pathOfFile.toFile();
 	}
 
-	public void executeGroovyScript(DatasetEditorFacade facade) throws ResourceException, ScriptException {
+	public void executeGroovyScript(DatasetEditorFacade facade) {
 		groovyObj.invokeMethod("runScript", facade);
 	}
 

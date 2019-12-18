@@ -104,8 +104,7 @@ public class ExportAndEditDatasetCommand implements CommandRunnable {
 					+ exportCommand.getCommandId() + "-" + dataConnection.getIdent() + ".xml"));
 			fileOut = new FileOutputStream(file);
 			FlatXmlDataSet.write(editorFacade.getDataSet(), fileOut);
-		} catch (DataSetException | ClassNotFoundException | DatasetReaderException | IOException
-				| GroovyReaderException | ResourceException | ScriptException e) {
+		} catch (DataSetException | IOException e) {
 			throw new CommandException(e.getMessage(), e);
 		} finally {
 			if (inputStream != null)
