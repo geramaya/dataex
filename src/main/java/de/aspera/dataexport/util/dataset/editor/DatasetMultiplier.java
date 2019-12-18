@@ -1,6 +1,5 @@
 package de.aspera.dataexport.util.dataset.editor;
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
@@ -17,7 +16,7 @@ public class DatasetMultiplier {
 		this.reader = reader;
 	}
 
-	public IDataSet multiplyData(int factor) throws DataSetException, SQLException {
+	public IDataSet multiplyData(int factor) throws DataSetException {
 		DefaultDataSet bigDataset = new DefaultDataSet();
 		List<String> tableNames = reader.getTabelNames();
 		Map<String, String> primaryKeys = null;
@@ -53,7 +52,7 @@ public class DatasetMultiplier {
 		return bigDataset;
 	}
 
-	public IDataSet multiplyRowInTable(String tableName, int row, int factor) throws DataSetException, SQLException {
+	public IDataSet multiplyRowInTable(String tableName, int row, int factor) throws DataSetException {
 		DefaultDataSet bigDataset = new DefaultDataSet();
 		DefaultTable bigTable = new DefaultTable(reader.getMetaDataOfTable(tableName));
 		Map<String, String> primaryKeys = null;
@@ -96,7 +95,7 @@ public class DatasetMultiplier {
 
 	}
 
-	public IDataSet multiplyDataInTable(String tableName, int factor) throws DataSetException, SQLException {
+	public IDataSet multiplyDataInTable(String tableName, int factor) throws DataSetException {
 		DefaultDataSet bigDataset = new DefaultDataSet();
 		Map<String, String> primaryKeys = null;
 		DefaultTable bigTable = new DefaultTable(reader.getMetaDataOfTable(tableName));

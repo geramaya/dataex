@@ -2,7 +2,6 @@ package de.aspera.dataexport.util.dataset.editor;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,7 +29,7 @@ public class DatasetReader {
 		buildTableMap();
 	}
 
-	public List<String> getTabelNames() throws DataSetException {
+	public List<String> getTabelNames() {
 		return new ArrayList<String>(tablesMap.keySet());
 	}
 
@@ -52,16 +51,22 @@ public class DatasetReader {
 		return colNames;
 	}
 
-	private void buildTableMap() throws DatasetReaderException, DataSetException {
+	private void buildTableMap() throws DatasetReaderException {
 		if (dataset == null) {
 			throw new DatasetReaderException("Dataset is null.");
 		}
 		tablesMap = new HashMap<String, ITable>();
-		String[] tableNames = dataset.getTableNames();
-		for (int i = 0; i < tableNames.length; i++) {
-			ITable table = dataset.getTable(tableNames[i]);
-			tablesMap.put(tableNames[i], table);
+		String[] tableNames;
+		try {
+			tableNames = dataset.getTableNames();
+			for (int i = 0; i < tableNames.length; i++) {
+				ITable table = dataset.getTable(tableNames[i]);
+				tablesMap.put(tableNames[i], table);
+			}
+		} catch (DataSetException e) {
+			throw new DatasetReaderException(e.getMessage());
 		}
+		
 	}
 
 	public ITableMetaData getMetaDataOfTable(String tableName) {
@@ -106,7 +111,7 @@ public class DatasetReader {
 	}
 
 	public IDataSet addRow(String tableName, Map<String, String> newValuesColName) throws RowOutOfBoundsException,
-			NoSuchColumnException, DataSetException, DatasetReaderException, SQLException {
+			NoSuchColumnException, DataSetException, DatasetReaderException {
 		DefaultTable table;
 		ITableMetaData metaData = getMetaDataOfTable(tableName);
 		//the table have no columns

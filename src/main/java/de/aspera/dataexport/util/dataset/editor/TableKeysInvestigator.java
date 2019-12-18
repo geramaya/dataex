@@ -27,10 +27,9 @@ public class TableKeysInvestigator {
 		try {
 			this.metaData = conn.getMetaData();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			TableKeysInvestigatorException ex = new TableKeysInvestigatorException(e.getMessage(), e);
+			ex.printStackTrace();
 		}
-
 	}
 
 	public DatabaseMetaData getMetaData() {
@@ -41,17 +40,23 @@ public class TableKeysInvestigator {
 		this.metaData = metaData;
 	}
 
-	public Map<String, String> getPrimarykeysOfTable(String tableName) throws SQLException {
+	public Map<String, String> getPrimarykeysOfTable(String tableName) {
 		if (keyTypeMap == null) {
 			keyTypeMap = new HashMap<String, String>();
 		}
-		ResultSet keySet = metaData.getPrimaryKeys(null, null, tableName);
-		while (keySet.next()) {
-			String colName = keySet.getString("COLUMN_NAME");
-			ResultSet column = metaData.getColumns(null, null, tableName, colName);
-			column.next();
-			keyTypeMap.put(tableName + "," + keySet.getString("COLUMN_NAME"),
-					column.getString("TYPE_NAME") + "," + column.getString("COLUMN_SIZE"));
+		ResultSet keySet;
+		try {
+			keySet = metaData.getPrimaryKeys(null, null, tableName);
+			while (keySet.next()) {
+				String colName = keySet.getString("COLUMN_NAME");
+				ResultSet column = metaData.getColumns(null, null, tableName, colName);
+				column.next();
+				keyTypeMap.put(tableName + "," + keySet.getString("COLUMN_NAME"),
+						column.getString("TYPE_NAME") + "," + column.getString("COLUMN_SIZE"));
+			}
+		} catch (SQLException e) {
+			TableKeysInvestigatorException ex = new TableKeysInvestigatorException(e.getMessage(), e);
+			ex.printStackTrace();
 		}
 
 		return keyTypeMap;
@@ -61,30 +66,39 @@ public class TableKeysInvestigator {
 	 * This Method can be replaced by finding the Max Number in the Dataset, which
 	 * should contain the same Data as the DB
 	 */
-	private int getMaxNumberValueInColFromDB(String tableName, String colName) throws SQLException {
-		Statement stmt = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-		ResultSet rs = stmt.executeQuery("select MAX(" + colName + ") as maxNum from " + tableName);
-		if (rs.next()) {
-			int result = rs.getInt("maxNum");
-			stmt.close();
-			return result;
+	private int getMaxNumberValueInColFromDB(String tableName, String colName) {
+		Statement stmt;
+		try {
+			stmt = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+			ResultSet rs = stmt.executeQuery("select MAX(" + colName + ") as maxNum from " + tableName);
+			if (rs.next()) {
+				int result = rs.getInt("maxNum");
+				stmt.close();
+				return result;
+			}
+		} catch (SQLException e) {
+			TableKeysInvestigatorException ex = new TableKeysInvestigatorException(e.getMessage(), e);
+			ex.printStackTrace();
 		}
+
 		return 0;
 	}
 
-	public String getValidPrimaryKeyValue(String tableName, String colName) throws SQLException {
+	public String getValidPrimaryKeyValue(String tableName, String colName) {
 		if (keyTypeMap == null || !keyTypeMap.containsKey(tableName + "," + colName)) {
 			getPrimarykeysOfTable(tableName);
 		}
 		String typeOfKey = keyTypeMap.get(tableName + "," + colName);
+
 		if (typeOfKey.toLowerCase().contains("number") || typeOfKey.toLowerCase().contains("int")) {
 			return getNextValidNumber(tableName, colName);
 		} else {
 			return getNextValidString(tableName, colName, typeOfKey);
 		}
+
 	}
 
-	private String getNextValidString(String tableName, String colName, String typeOfKey) throws SQLException {
+	private String getNextValidString(String tableName, String colName, String typeOfKey) {
 		String validStr;
 		Set<String> valuesSet;
 		if (strKeyValueMap == null) {
@@ -104,19 +118,26 @@ public class TableKeysInvestigator {
 		return validStr;
 	}
 
-	private Set<String> getAllCharValuesInColumnFromDB(String tableName, String colName) throws SQLException {
-		Statement stmt = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-		ResultSet rs = stmt.executeQuery("select " + colName + " as charValue from " + tableName);
-		Set<String> resultSet = new HashSet<String>();
-		while (rs.next()) {
-			String result = rs.getNString("charValue");
-			resultSet.add(result);
+	private Set<String> getAllCharValuesInColumnFromDB(String tableName, String colName)  {
+		Statement stmt;
+		Set<String> resultSet = new HashSet<String>();;
+		try {
+			stmt = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+			ResultSet rs = stmt.executeQuery("select " + colName + " as charValue from " + tableName);
+			while (rs.next()) {
+				String result = rs.getNString("charValue");
+				resultSet.add(result);
+			}
+			stmt.close();
+		} catch (SQLException e) {
+			TableKeysInvestigatorException ex = new TableKeysInvestigatorException(e.getMessage(), e);
+			ex.printStackTrace();
 		}
-		stmt.close();
+		
 		return resultSet;
 	}
 
-	private String getNextValidNumber(String tableName, String colName) throws SQLException {
+	private String getNextValidNumber(String tableName, String colName) {
 		int maxNumber;
 		if (numericKeyValueMap == null) {
 			numericKeyValueMap = new HashMap<String, Integer>();
@@ -131,13 +152,19 @@ public class TableKeysInvestigator {
 		numericKeyValueMap.put(tableName + "," + colName, maxNumber);
 		return Integer.toString(maxNumber);
 	}
-	
-	public List<String> getColumnNamesOfTable(String tableName) throws SQLException {
+
+	public List<String> getColumnNamesOfTable(String tableName)  {
 		List<String> colNames = new ArrayList<String>();
-		ResultSet colNameSet = metaData.getColumns(null, null, tableName, null);
-		while (colNameSet.next()) {
-			colNames.add(colNameSet.getString("COLUMN_NAME"));
-		}
+		ResultSet colNameSet;
+		try {
+			colNameSet = metaData.getColumns(null, null, tableName, null);
+			while (colNameSet.next()) {
+				colNames.add(colNameSet.getString("COLUMN_NAME"));
+			}
+		} catch (SQLException e) {
+			TableKeysInvestigatorException ex = new TableKeysInvestigatorException(e.getMessage(), e);
+			ex.printStackTrace();
+		}		
 		return colNames;
 	}
 

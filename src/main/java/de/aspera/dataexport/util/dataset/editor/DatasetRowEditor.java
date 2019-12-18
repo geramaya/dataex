@@ -1,6 +1,5 @@
 package de.aspera.dataexport.util.dataset.editor;
 
-import java.sql.SQLException;
 import java.util.Map;
 
 import org.dbunit.dataset.DataSetException;
@@ -19,21 +18,21 @@ public class DatasetRowEditor {
 	 * to be changed
 	 */
 	public IDataSet changeValuesInRow(String tableName, int row, Map<String, String> newValuesColName)
-			throws DataSetException, DatasetReaderException, SQLException {
-		Map<String, String> primaryKeys=null;
+			throws DataSetException, DatasetReaderException {
+		Map<String, String> primaryKeys = null;
 		Map<String, String> colNameValueMap = reader.getRowOfTable(tableName, row);
-		if(tableInvestigator!=null) {
+		if (tableInvestigator != null) {
 			primaryKeys = tableInvestigator.getPrimarykeysOfTable(tableName);
 		}
 		for (String colName : newValuesColName.keySet()) {
 			// don't exchange values of the primary keys
-			if(primaryKeys!=null) {
-				//filter the primary keys out
+			if (primaryKeys != null) {
+				// filter the primary keys out
 				if (!primaryKeys.keySet().contains(tableName + "," + colName)) {
 					String value = newValuesColName.get(colName);
 					colNameValueMap.put(colName, value);
 				}
-			}else {
+			} else {
 				// update all values without taking the primary keys into consideration
 				String value = newValuesColName.get(colName);
 				colNameValueMap.put(colName, value);
@@ -43,7 +42,7 @@ public class DatasetRowEditor {
 	}
 
 	public IDataSet addRow(String tableName, Map<String, String> newValuesColName)
-			throws DataSetException, DatasetReaderException, SQLException {
+			throws DataSetException, DatasetReaderException {
 		return reader.addRow(tableName, newValuesColName);
 	}
 

@@ -4,7 +4,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
@@ -35,7 +34,7 @@ public class DatasetEditorFacade {
 		reader.setDataset(dataset);
 	}
 
-	public List<String> getTabelNames() throws DataSetException {
+	public List<String> getTabelNames() {
 		return reader.getTabelNames();
 	}
 
@@ -55,29 +54,29 @@ public class DatasetEditorFacade {
 		return reader.getRowOfTable(tableName, row);
 	}
 
-	public void multiplyData(int factor) throws DataSetException, DatasetReaderException, SQLException {
+	public void multiplyData(int factor) throws DataSetException, DatasetReaderException {
 		reader.setDataset(multiplier.multiplyData(factor));
 	}
 
-	public void multiplyRowInTable(String tableName, int row, int factor) throws DataSetException, DatasetReaderException, SQLException {
+	public void multiplyRowInTable(String tableName, int row, int factor)
+			throws DataSetException, DatasetReaderException {
 		reader.setDataset(multiplier.multiplyRowInTable(tableName, row, factor));
 	}
-	
-	public void multiplyDataInTable(String tableName, int factor) throws DataSetException, DatasetReaderException, SQLException {
+
+	public void multiplyDataInTable(String tableName, int factor) throws DataSetException, DatasetReaderException {
 		reader.setDataset(multiplier.multiplyDataInTable(tableName, factor));
 	}
 
 	public void changeValuesInRow(String tableName, int row, Map<String, String> newValuesColName)
-			throws DataSetException, DatasetReaderException, SQLException {
+			throws DataSetException, DatasetReaderException {
 		reader.setDataset(rowEditor.changeValuesInRow(tableName, row, newValuesColName));
 	}
 
 	public void addRow(String tableName, Map<String, String> newValuesColName)
-			throws DataSetException, DatasetReaderException, SQLException {
+			throws DataSetException, DatasetReaderException {
 		reader.setDataset(rowEditor.addRow(tableName, newValuesColName));
 	}
 
-	
 	public void setConnectionOfDB(Connection conn) {
 		tableInvestigator.setConnection(conn);
 		reader.setTableKeyInvestigator(tableInvestigator);
