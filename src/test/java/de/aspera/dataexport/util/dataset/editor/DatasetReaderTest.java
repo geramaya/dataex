@@ -34,7 +34,7 @@ public class DatasetReaderTest {
 	}
 
 	@Test
-	public void testTable() throws DataSetException {
+	public void testTable() throws DataSetException, DatasetReaderException {
 		assertTrue("Wrong number of Rows", reader.getTabelNames().contains("test-table"));
 		assertEquals(3, reader.getColumnNamesOfTable("test-table").size(), "wrong Number of Columns");
 		assertEquals(0, reader.getMetaDataOfTable("test-table").getColumnIndex("val1Col"), "wrong Index of Columns");

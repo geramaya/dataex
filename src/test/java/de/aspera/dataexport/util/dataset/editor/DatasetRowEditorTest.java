@@ -39,7 +39,7 @@ public class DatasetRowEditorTest {
 	}
 
 	@Test
-	public void testChangeValuesInTable() throws DataSetException, DatasetReaderException, SQLException {
+	public void testChangeValuesInTable() throws DataSetException, DatasetReaderException, SQLException, TableKeysInvestigatorException {
 		Map<String, String> newColNameValueMap = new HashMap<String, String>();
 		newColNameValueMap.put("val1Col", "newValCol1");
 		newColNameValueMap.put("val3Col", "newValCol3");
@@ -50,7 +50,7 @@ public class DatasetRowEditorTest {
 	}
 	
 	@Test
-	public void testAddRowToTable() throws DataSetException, DatasetReaderException, SQLException {
+	public void testAddRowToTable() throws DataSetException, DatasetReaderException, SQLException, TableKeysInvestigatorException {
 		Map<String, String> newColNameValueMap = new HashMap<String, String>();
 		newColNameValueMap.put("val1Col", "newValCol1");
 		newColNameValueMap.put("val3Col", "newValCol3");

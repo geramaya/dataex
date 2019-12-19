@@ -5,7 +5,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -13,22 +12,17 @@ import java.util.logging.Logger;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.dbunit.DatabaseUnitException;
-import org.dbunit.dataset.DataSetException;
 import org.dbunit.dataset.xml.FlatXmlDataSet;
 
 import de.aspera.dataexport.groovy.GroovyReader;
-import de.aspera.dataexport.groovy.GroovyReaderException;
 import de.aspera.dataexport.util.ExporterController;
 import de.aspera.dataexport.util.dataset.editor.DatasetEditorFacade;
-import de.aspera.dataexport.util.dataset.editor.DatasetReaderException;
 import de.aspera.dataexport.util.json.ExportJsonCommand;
 import de.aspera.dataexport.util.json.ExportJsonCommandHolder;
 import de.aspera.dataexport.util.json.ImportJsonCommandException;
 import de.aspera.dataexport.util.json.JsonConnectionHolder;
 import de.aspera.dataexport.util.json.JsonConnectionReadException;
 import de.aspera.dataexport.util.json.JsonDatabase;
-import groovy.util.ResourceException;
-import groovy.util.ScriptException;
 
 public class ExportAndEditDatasetCommand implements CommandRunnable {
 	private static final Logger LOGGER = Logger.getLogger(ExportAndEditDatasetCommand.class.getName());
@@ -104,7 +98,7 @@ public class ExportAndEditDatasetCommand implements CommandRunnable {
 					+ exportCommand.getCommandId() + "-" + dataConnection.getIdent() + ".xml"));
 			fileOut = new FileOutputStream(file);
 			FlatXmlDataSet.write(editorFacade.getDataSet(), fileOut);
-		} catch (DataSetException | IOException e) {
+		} catch (Exception e) {
 			throw new CommandException(e.getMessage(), e);
 		} finally {
 			if (inputStream != null)

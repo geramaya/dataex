@@ -50,7 +50,7 @@ public class TableKeysInvestigatorTest {
 	DefaultDataSet dataset;
 
 	@Before
-	public void setUp() throws SQLException, DataSetException {
+	public void setUp() throws SQLException, DataSetException, TableKeysInvestigatorException {
 		tableInvestigator = new TableKeysInvestigator();
 		dataset = new DefaultDataSet();
 		Mockito.when(conn.getMetaData()).thenReturn(metadata);
@@ -102,7 +102,7 @@ public class TableKeysInvestigatorTest {
 	}
 
 	@Test
-	public void testPrimaryKeyNames() throws SQLException {
+	public void testPrimaryKeyNames() throws SQLException, TableKeysInvestigatorException {
 		assertTrue("key of the first table is false",
 				tableInvestigator.getPrimarykeysOfTable("test-tab").containsKey("test-tab,val1Col"));
 		assertTrue("key of the second table is false",
@@ -110,7 +110,7 @@ public class TableKeysInvestigatorTest {
 	}
 
 	@Test
-	public void testValidPrimaryKeyValues() throws SQLException {
+	public void testValidPrimaryKeyValues() throws SQLException, TableKeysInvestigatorException {
 		// nummeric keys
 		String numKey = tableInvestigator.getValidPrimaryKeyValue("test-tab", "val1Col");
 		assertTrue("the nummeric key is not correct", numKey.equalsIgnoreCase("2"));

@@ -63,7 +63,6 @@ public class ExportDatasetCommand implements CommandRunnable {
 			if (fileOut != null)
 				IOUtils.closeQuietly(fileOut);
 		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 			throw new CommandException(e.getMessage(), e);
 		}
 	}

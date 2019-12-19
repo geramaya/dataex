@@ -53,7 +53,6 @@ public class ImportDatasetCommand implements CommandRunnable {
 				DatabaseOperation.INSERT.execute(connection, dataSet);
 			}
 		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 			throw new CommandException(e.getMessage(), e);
 		}
 

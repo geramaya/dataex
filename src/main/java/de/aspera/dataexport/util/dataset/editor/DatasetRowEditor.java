@@ -16,7 +16,7 @@ public class DatasetRowEditor {
 	 * The Map of the new values must not have all the Column names, only the ones
 	 * to be changed
 	 */
-	public IDataSet changeValuesInRow(String tableName, int row, Map<String, String> newValuesColName){
+	public IDataSet changeValuesInRow(String tableName, int row, Map<String, String> newValuesColName) throws DatasetReaderException, TableKeysInvestigatorException{
 		Map<String, String> primaryKeys = null;
 		Map<String, String> colNameValueMap = reader.getRowOfTable(tableName, row);
 		if (tableInvestigator != null) {
@@ -39,7 +39,7 @@ public class DatasetRowEditor {
 		return reader.exchangeRow(tableName, row, colNameValueMap);
 	}
 
-	public IDataSet addRow(String tableName, Map<String, String> newValuesColName){
+	public IDataSet addRow(String tableName, Map<String, String> newValuesColName) throws TableKeysInvestigatorException, DatasetReaderException{
 		return reader.addRow(tableName, newValuesColName);
 	}
 

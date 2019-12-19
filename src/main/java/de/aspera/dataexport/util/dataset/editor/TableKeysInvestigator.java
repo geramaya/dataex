@@ -22,13 +22,12 @@ public class TableKeysInvestigator {
 	private Map<String, Set<String>> strKeyValueMap;
 	private static final DataFaker faker = new DataFaker();
 
-	public void setConnection(Connection conn) {
+	public void setConnection(Connection conn) throws TableKeysInvestigatorException {
 		this.conn = conn;
 		try {
 			this.metaData = conn.getMetaData();
 		} catch (SQLException e) {
-			TableKeysInvestigatorException ex = new TableKeysInvestigatorException(e.getMessage(), e);
-			ex.printStackTrace();
+			throw new TableKeysInvestigatorException(e.getMessage(), e);
 		}
 	}
 
@@ -40,7 +39,7 @@ public class TableKeysInvestigator {
 		this.metaData = metaData;
 	}
 
-	public Map<String, String> getPrimarykeysOfTable(String tableName) {
+	public Map<String, String> getPrimarykeysOfTable(String tableName) throws TableKeysInvestigatorException {
 		if (keyTypeMap == null) {
 			keyTypeMap = new HashMap<String, String>();
 		}
@@ -55,8 +54,7 @@ public class TableKeysInvestigator {
 						column.getString("TYPE_NAME") + "," + column.getString("COLUMN_SIZE"));
 			}
 		} catch (SQLException e) {
-			TableKeysInvestigatorException ex = new TableKeysInvestigatorException(e.getMessage(), e);
-			ex.printStackTrace();
+			throw new TableKeysInvestigatorException(e.getMessage(), e);
 		}
 
 		return keyTypeMap;
@@ -66,7 +64,7 @@ public class TableKeysInvestigator {
 	 * This Method can be replaced by finding the Max Number in the Dataset, which
 	 * should contain the same Data as the DB
 	 */
-	private int getMaxNumberValueInColFromDB(String tableName, String colName) {
+	private int getMaxNumberValueInColFromDB(String tableName, String colName) throws TableKeysInvestigatorException {
 		Statement stmt;
 		try {
 			stmt = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
@@ -77,14 +75,13 @@ public class TableKeysInvestigator {
 				return result;
 			}
 		} catch (SQLException e) {
-			TableKeysInvestigatorException ex = new TableKeysInvestigatorException(e.getMessage(), e);
-			ex.printStackTrace();
+			throw new TableKeysInvestigatorException(e.getMessage(), e);
 		}
 
 		return 0;
 	}
 
-	public String getValidPrimaryKeyValue(String tableName, String colName) {
+	public String getValidPrimaryKeyValue(String tableName, String colName) throws TableKeysInvestigatorException {
 		if (keyTypeMap == null || !keyTypeMap.containsKey(tableName + "," + colName)) {
 			getPrimarykeysOfTable(tableName);
 		}
@@ -98,7 +95,7 @@ public class TableKeysInvestigator {
 
 	}
 
-	private String getNextValidString(String tableName, String colName, String typeOfKey) {
+	private String getNextValidString(String tableName, String colName, String typeOfKey) throws TableKeysInvestigatorException {
 		String validStr;
 		Set<String> valuesSet;
 		if (strKeyValueMap == null) {
@@ -118,7 +115,7 @@ public class TableKeysInvestigator {
 		return validStr;
 	}
 
-	private Set<String> getAllCharValuesInColumnFromDB(String tableName, String colName)  {
+	private Set<String> getAllCharValuesInColumnFromDB(String tableName, String colName) throws TableKeysInvestigatorException  {
 		Statement stmt;
 		Set<String> resultSet = new HashSet<String>();;
 		try {
@@ -130,14 +127,13 @@ public class TableKeysInvestigator {
 			}
 			stmt.close();
 		} catch (SQLException e) {
-			TableKeysInvestigatorException ex = new TableKeysInvestigatorException(e.getMessage(), e);
-			ex.printStackTrace();
+			throw new TableKeysInvestigatorException(e.getMessage(), e);
 		}
 		
 		return resultSet;
 	}
 
-	private String getNextValidNumber(String tableName, String colName) {
+	private String getNextValidNumber(String tableName, String colName) throws TableKeysInvestigatorException {
 		int maxNumber;
 		if (numericKeyValueMap == null) {
 			numericKeyValueMap = new HashMap<String, Integer>();
@@ -153,7 +149,7 @@ public class TableKeysInvestigator {
 		return Integer.toString(maxNumber);
 	}
 
-	public List<String> getColumnNamesOfTable(String tableName)  {
+	public List<String> getColumnNamesOfTable(String tableName) throws TableKeysInvestigatorException  {
 		List<String> colNames = new ArrayList<String>();
 		ResultSet colNameSet;
 		try {
@@ -162,8 +158,7 @@ public class TableKeysInvestigator {
 				colNames.add(colNameSet.getString("COLUMN_NAME"));
 			}
 		} catch (SQLException e) {
-			TableKeysInvestigatorException ex = new TableKeysInvestigatorException(e.getMessage(), e);
-			ex.printStackTrace();
+			throw new TableKeysInvestigatorException(e.getMessage(), e);
 		}		
 		return colNames;
 	}

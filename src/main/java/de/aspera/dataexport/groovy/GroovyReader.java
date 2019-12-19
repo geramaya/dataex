@@ -17,18 +17,17 @@ public class GroovyReader {
 	private GroovyObject groovyObj;
 	private static final GroovyClassLoader classLoader = new GroovyClassLoader();
 
-	public GroovyReader()  {
+	public GroovyReader() throws GroovyReaderException  {
 		readGroovyScript();
 	}
 
-	private void readGroovyScript() {
+	private void readGroovyScript() throws GroovyReaderException {
 		script = getGroovyScriptFile();
 		try {
 			Class groovyClass = classLoader.parseClass(script);
 			groovyObj = (GroovyObject) groovyClass.newInstance();
 		} catch (InstantiationException | IllegalAccessException | CompilationFailedException | IOException e) {
-			GroovyReaderException ex = new GroovyReaderException(e.getMessage(), e);
-			ex.printStackTrace();
+			throw  new GroovyReaderException(e.getMessage(), e);
 		}
 
 	}
