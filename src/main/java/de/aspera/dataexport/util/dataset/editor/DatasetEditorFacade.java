@@ -22,18 +22,17 @@ public class DatasetEditorFacade {
 		this.tableInvestigator = new TableKeysInvestigator();
 	}
 
-	public void readDataset(String filePath) {
+	public void readDataset(String filePath) throws DatasetReaderException {
 		reader.readDataset(filePath);
 	}
 
-	public void readDataset(InputStream stream) {
+	public void readDataset(InputStream stream) throws DatasetEditorException, DatasetReaderException {
 		IDataSet dataset;
 		try {
 			dataset = new FlatXmlDataSetBuilder().build(stream);
 			reader.setDataset(dataset);
 		} catch (DataSetException e) {
-			DatasetEditorException ex = new DatasetEditorException(e.getMessage(), e);
-			ex.printStackTrace();
+			throw new DatasetEditorException(e.getMessage(), e);
 		}
 	}
 
@@ -45,39 +44,39 @@ public class DatasetEditorFacade {
 		return reader.getRowCountOfTable(tableName);
 	}
 
-	public List<String> getColumnNamesOfTable(String tableName) {
+	public List<String> getColumnNamesOfTable(String tableName) throws DatasetReaderException {
 		return reader.getColumnNamesOfTable(tableName);
 	}
 
-	public String getValueInTable(String tableName, int row, String colName) {
+	public String getValueInTable(String tableName, int row, String colName) throws DatasetReaderException {
 		return reader.getValueInTable(tableName, row, colName).toString();
 	}
 
-	public Map<String, String> getRowOfTable(String tableName, int row) {
+	public Map<String, String> getRowOfTable(String tableName, int row) throws DatasetReaderException {
 		return reader.getRowOfTable(tableName, row);
 	}
 
-	public void multiplyData(int factor) {
+	public void multiplyData(int factor) throws TableKeysInvestigatorException, DatasetReaderException, DatasetMultiplierException {
 		reader.setDataset(multiplier.multiplyData(factor));
 	}
 
-	public void multiplyRowInTable(String tableName, int row, int factor) {
+	public void multiplyRowInTable(String tableName, int row, int factor) throws TableKeysInvestigatorException, DatasetReaderException, DatasetMultiplierException {
 		reader.setDataset(multiplier.multiplyRowInTable(tableName, row, factor));
 	}
 
-	public void multiplyDataInTable(String tableName, int factor){
+	public void multiplyDataInTable(String tableName, int factor) throws TableKeysInvestigatorException, DatasetReaderException, DatasetMultiplierException{
 		reader.setDataset(multiplier.multiplyDataInTable(tableName, factor));
 	}
 
-	public void changeValuesInRow(String tableName, int row, Map<String, String> newValuesColName) {
+	public void changeValuesInRow(String tableName, int row, Map<String, String> newValuesColName) throws DatasetReaderException, TableKeysInvestigatorException {
 		reader.setDataset(rowEditor.changeValuesInRow(tableName, row, newValuesColName));
 	}
 
-	public void addRow(String tableName, Map<String, String> newValuesColName){
+	public void addRow(String tableName, Map<String, String> newValuesColName) throws TableKeysInvestigatorException, DatasetReaderException{
 		reader.setDataset(rowEditor.addRow(tableName, newValuesColName));
 	}
 
-	public void setConnectionOfDB(Connection conn) {
+	public void setConnectionOfDB(Connection conn) throws TableKeysInvestigatorException {
 		tableInvestigator.setConnection(conn);
 		reader.setTableKeyInvestigator(tableInvestigator);
 		rowEditor.setTableKeyInvestigator(tableInvestigator);

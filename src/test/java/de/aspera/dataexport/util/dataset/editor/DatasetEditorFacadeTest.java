@@ -50,7 +50,7 @@ public class DatasetEditorFacadeTest {
 	}
 	
 	@Test
-	public void testReadDatasetStream() throws IOException, DataSetException, ClassNotFoundException, DatasetReaderException {	
+	public void testReadDatasetStream() throws IOException, DataSetException, ClassNotFoundException, DatasetReaderException, DatasetEditorException {	
 		File file = tempFolder.newFile("testDataSet.xml");
 		FileOutputStream out = new FileOutputStream(file);
 		FlatXmlDataSet.write(dataset, out);

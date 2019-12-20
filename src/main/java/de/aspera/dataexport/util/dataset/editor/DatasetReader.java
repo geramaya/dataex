@@ -22,12 +22,11 @@ public class DatasetReader {
 	private Map<String, ITable> tablesMap;
 	private TableKeysInvestigator tableInvestigator;
 
-	public void readDataset(String filePath) {
+	public void readDataset(String filePath) throws DatasetReaderException {
 		try {
 			this.dataset = new FlatXmlDataSetBuilder().build(new FileInputStream(filePath));
 		} catch (DataSetException | FileNotFoundException e) {
-			DatasetReaderException ex = new DatasetReaderException(e.getMessage(), e);
-			ex.printStackTrace();
+			throw new DatasetReaderException(e.getMessage(), e);
 		}
 		buildTableMap();
 	}
@@ -40,12 +39,12 @@ public class DatasetReader {
 		return this.tablesMap.get(tableName).getRowCount();
 	}
 
-	public void setDataset(IDataSet dataset) {
+	public void setDataset(IDataSet dataset) throws DatasetReaderException {
 		this.dataset = dataset;
 		buildTableMap();
 	}
 
-	public List<String> getColumnNamesOfTable(String tableName) {
+	public List<String> getColumnNamesOfTable(String tableName) throws DatasetReaderException {
 		List<String> colNames = new ArrayList<String>();
 		try {
 			Column[] cols = tablesMap.get(tableName).getTableMetaData().getColumns();
@@ -53,16 +52,14 @@ public class DatasetReader {
 				colNames.add(cols[i].getColumnName());
 			}
 		} catch (DataSetException e) {
-			DatasetReaderException ex = new DatasetReaderException(e.getMessage(), e);
-			ex.printStackTrace();
+			throw new DatasetReaderException(e.getMessage(), e);
 		}
 		return colNames;
 	}
 
-	private void buildTableMap() {
+	private void buildTableMap() throws DatasetReaderException {
 		if (dataset == null) {
-			DatasetReaderException ex = new DatasetReaderException("DataSet is null in the reader!");
-			ex.printStackTrace();
+			throw new DatasetReaderException("DataSet is null in the reader!");
 		}
 		tablesMap = new HashMap<String, ITable>();
 		String[] tableNames;
@@ -73,8 +70,7 @@ public class DatasetReader {
 				tablesMap.put(tableNames[i], table);
 			}
 		} catch (DataSetException e) {
-			DatasetReaderException ex = new DatasetReaderException(e.getMessage(), e);
-			ex.printStackTrace();
+			throw new DatasetReaderException(e.getMessage(), e);
 		}
 
 	}
@@ -83,18 +79,17 @@ public class DatasetReader {
 		return tablesMap.get(tableName).getTableMetaData();
 	}
 
-	public Object getValueInTable(String tableName, int row, String colName) {
+	public Object getValueInTable(String tableName, int row, String colName) throws DatasetReaderException {
 		Object value = null;
 		try {
 			value = tablesMap.get(tableName).getValue(row, colName);
 		} catch (DataSetException e) {
-			DatasetReaderException ex = new DatasetReaderException(e.getMessage(), e);
-			ex.printStackTrace();
+			throw new DatasetReaderException(e.getMessage(), e);
 		}
 		return value;
 	}
 
-	public Map<String, String> getRowOfTable(String tableName, int row) {
+	public Map<String, String> getRowOfTable(String tableName, int row) throws DatasetReaderException {
 		Map<String, String> colNameValueMap = new HashMap<String, String>();
 		List<String> colNames = getColumnNamesOfTable(tableName);
 		for (String colName : colNames) {
@@ -103,7 +98,7 @@ public class DatasetReader {
 		return colNameValueMap;
 	}
 
-	public IDataSet exchangeRow(String tableName, int row, Map<String, String> colNameValueMap) {
+	public IDataSet exchangeRow(String tableName, int row, Map<String, String> colNameValueMap) throws DatasetReaderException {
 		DefaultTable table = new DefaultTable(getMetaDataOfTable(tableName));
 		DefaultDataSet editedDataSet = null;
 		try {
@@ -126,13 +121,12 @@ public class DatasetReader {
 				}
 			}
 		} catch (DataSetException e) {
-			DatasetReaderException ex = new DatasetReaderException(e.getMessage(), e);
-			ex.printStackTrace();
+			throw new DatasetReaderException(e.getMessage(), e);
 		}
 		return editedDataSet;
 	}
 
-	public IDataSet addRow(String tableName, Map<String, String> newValuesColName) {
+	public IDataSet addRow(String tableName, Map<String, String> newValuesColName) throws TableKeysInvestigatorException, DatasetReaderException {
 		DefaultTable table;
 		DefaultDataSet editedDataSet = null;
 		ITableMetaData metaData = getMetaDataOfTable(tableName);
@@ -180,14 +174,13 @@ public class DatasetReader {
 				}
 			}
 		} catch (DataSetException e) {
-			DatasetReaderException ex = new DatasetReaderException(e.getMessage(), e);
-			ex.printStackTrace();
+			throw new DatasetReaderException(e.getMessage(), e);
 		}
 
 		return editedDataSet;
 	}
 
-	public int getMaxNumberinColumnFromDataSet(String tableName, String colName) {
+	public int getMaxNumberinColumnFromDataSet(String tableName, String colName) throws DatasetReaderException {
 		int numberOfRows = getRowCountOfTable(tableName);
 		int maxNum = 0;
 		for (int i = 0; i < numberOfRows; i++) {

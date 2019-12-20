@@ -36,7 +36,7 @@ public class DatasetMultiplierTest {
 	}
 
 	@Test
-	public void testMultiplyAllTable() throws DataSetException, SQLException {
+	public void testMultiplyAllTable() throws DataSetException, SQLException, TableKeysInvestigatorException, DatasetReaderException, DatasetMultiplierException {
 		IDataSet newDataset = multiplier.multiplyData(4);
 		assertEquals(5, newDataset.getTable("test-table").getRowCount(), "Wrong number of Rows");
 		Column[] cols = newDataset.getTable("test-table").getTableMetaData().getColumns();
@@ -50,7 +50,7 @@ public class DatasetMultiplierTest {
 	}
 	
 	@Test
-	public void testMultiplyRowInTable() throws DataSetException, SQLException {
+	public void testMultiplyRowInTable() throws DataSetException, SQLException, TableKeysInvestigatorException, DatasetReaderException, DatasetMultiplierException {
 		IDataSet newDataset = multiplier.multiplyRowInTable("test-table", 0, 5);
 		assertEquals(6, newDataset.getTable("test-table").getRowCount(), "Wrong number of Rows");
 		Column[] cols = newDataset.getTable("test-table").getTableMetaData().getColumns();

@@ -16,7 +16,7 @@ public class DatasetMultiplier {
 		this.reader = reader;
 	}
 
-	public IDataSet multiplyData(int factor) {
+	public IDataSet multiplyData(int factor) throws TableKeysInvestigatorException, DatasetReaderException, DatasetMultiplierException {
 		DefaultDataSet bigDataset = new DefaultDataSet();
 		List<String> tableNames = reader.getTabelNames();
 		Map<String, String> primaryKeys = null;
@@ -51,13 +51,12 @@ public class DatasetMultiplier {
 				bigDataset.addTable(bigTable);
 			}
 		} catch (DataSetException e) {
-			DatasetMultiplierException ex = new DatasetMultiplierException(e.getMessage(), e);
-			ex.printStackTrace();
+			throw new DatasetMultiplierException(e.getMessage(), e);
 		}
 		return bigDataset;
 	}
 
-	public IDataSet multiplyRowInTable(String tableName, int row, int factor) {
+	public IDataSet multiplyRowInTable(String tableName, int row, int factor) throws TableKeysInvestigatorException, DatasetReaderException, DatasetMultiplierException {
 		DefaultDataSet bigDataset = new DefaultDataSet();
 		DefaultTable bigTable = new DefaultTable(reader.getMetaDataOfTable(tableName));
 		Map<String, String> primaryKeys = null;
@@ -94,8 +93,7 @@ public class DatasetMultiplier {
 				}
 			}
 		} catch (DataSetException e) {
-			DatasetMultiplierException ex = new DatasetMultiplierException(e.getMessage(), e);
-			ex.printStackTrace();
+			throw new DatasetMultiplierException(e.getMessage(), e);
 		}
 		return bigDataset;
 	}
@@ -105,7 +103,7 @@ public class DatasetMultiplier {
 
 	}
 
-	public IDataSet multiplyDataInTable(String tableName, int factor) {
+	public IDataSet multiplyDataInTable(String tableName, int factor) throws TableKeysInvestigatorException, DatasetReaderException, DatasetMultiplierException {
 		DefaultDataSet bigDataset = new DefaultDataSet();
 		Map<String, String> primaryKeys = null;
 		DefaultTable bigTable = new DefaultTable(reader.getMetaDataOfTable(tableName));
@@ -144,8 +142,7 @@ public class DatasetMultiplier {
 				}
 			}
 		} catch (DataSetException e) {
-			DatasetMultiplierException ex = new DatasetMultiplierException(e.getMessage(), e);
-			ex.printStackTrace();
+			throw new DatasetMultiplierException(e.getMessage(), e);
 		}
 		return bigDataset;
 	}
