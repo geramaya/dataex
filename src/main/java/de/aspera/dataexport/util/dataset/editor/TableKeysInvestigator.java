@@ -5,22 +5,16 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import de.aspera.dataexport.dataFaker.DataFaker;
-
 public class TableKeysInvestigator {
 	private DatabaseMetaData metaData;
 	private Connection conn;
-	private Map<String, String> keyTypeMap;
-	private Map<String, Integer> numericKeyValueMap;
-	private Map<String, Set<String>> strKeyValueMap;
-	private static final DataFaker faker = new DataFaker();
+	private HashMap<String, String> keyTypeMap;
 
 	public void setConnection(Connection conn) throws TableKeysInvestigatorException {
 		this.conn = conn;
@@ -39,10 +33,27 @@ public class TableKeysInvestigator {
 		this.metaData = metaData;
 	}
 
-	public Map<String, String> getPrimarykeysOfTable(String tableName) throws TableKeysInvestigatorException {
-		if (keyTypeMap == null) {
-			keyTypeMap = new HashMap<String, String>();
+	public HashMap<String, TableConstrainsDescription> createTableConstrainsDescriptions(List<String> tabelNames)
+			throws TableKeysInvestigatorException {
+		HashMap<String, TableConstrainsDescription> tableConstrians = new HashMap<String, TableConstrainsDescription>();
+		for (String tabName : tabelNames) {
+			TableConstrainsDescription tabDescription = new TableConstrainsDescription();
+			tabDescription.setColumnNamesType(getColumnNamesTypeOfTable(tabName));
+			tabDescription.setNumericPrimaryKeyValueMap(getNumericValuesMapForKey("primaryKey", tabName));
+			tabDescription.setCharPrimaryKeyValueMap(getCharValuesMapForKey("primaryKey", tabName));
+			tabDescription.setUniqueCharColTypeMap(getCharValuesMapForKey("unique", tabName));
+			tabDescription.setUniqueNumericColTypeMap(getNumericValuesMapForKey("unique", tabName));
+			// last step
+			keyTypeMap=null;
+			tableConstrians.put(tabName, tabDescription);
 		}
+		return tableConstrians;
+
+	}
+
+	private Map<String, String> getPrimarykeysOfTable(String tableName) throws TableKeysInvestigatorException {
+		if (keyTypeMap == null || keyTypeMap.isEmpty())
+			keyTypeMap = new HashMap<String, String>();
 		ResultSet keySet;
 		try {
 			keySet = metaData.getPrimaryKeys(null, null, tableName);
@@ -50,8 +61,7 @@ public class TableKeysInvestigator {
 				String colName = keySet.getString("COLUMN_NAME");
 				ResultSet column = metaData.getColumns(null, null, tableName, colName);
 				column.next();
-				keyTypeMap.put(tableName + "," + keySet.getString("COLUMN_NAME"),
-						column.getString("TYPE_NAME") + "," + column.getString("COLUMN_SIZE"));
+				keyTypeMap.put(colName, column.getString("TYPE_NAME") + "," + column.getString("COLUMN_SIZE"));
 			}
 		} catch (SQLException e) {
 			throw new TableKeysInvestigatorException(e.getMessage(), e);
@@ -81,43 +91,10 @@ public class TableKeysInvestigator {
 		return 0;
 	}
 
-	public String getValidPrimaryKeyValue(String tableName, String colName) throws TableKeysInvestigatorException {
-		if (keyTypeMap == null || !keyTypeMap.containsKey(tableName + "," + colName)) {
-			getPrimarykeysOfTable(tableName);
-		}
-		String typeOfKey = keyTypeMap.get(tableName + "," + colName);
-
-		if (typeOfKey.toLowerCase().contains("number") || typeOfKey.toLowerCase().contains("int")) {
-			return getNextValidNumber(tableName, colName);
-		} else {
-			return getNextValidString(tableName, colName, typeOfKey);
-		}
-
-	}
-
-	private String getNextValidString(String tableName, String colName, String typeOfKey) throws TableKeysInvestigatorException {
-		String validStr;
-		Set<String> valuesSet;
-		if (strKeyValueMap == null) {
-			strKeyValueMap = new HashMap<String, Set<String>>();
-		}
-		if (!strKeyValueMap.containsKey(tableName + "," + colName)) {
-			Set<String> setOfAllStrValues = getAllCharValuesInColumnFromDB(tableName, colName);
-			strKeyValueMap.put(tableName + "," + colName, setOfAllStrValues);
-		}
-		valuesSet = strKeyValueMap.get(tableName + "," + colName);
-		int strLength = Integer.parseInt(typeOfKey.split(",")[1]);
-		validStr = faker.fakeStringWithLength(strLength);
-		while (!valuesSet.add(validStr)) {
-			// TODO: make the implementation of the faker better
-			validStr = faker.fakeStringWithLength(strLength);
-		}
-		return validStr;
-	}
-
-	private Set<String> getAllCharValuesInColumnFromDB(String tableName, String colName) throws TableKeysInvestigatorException  {
+	private Set<String> getAllCharValuesInColumnFromDB(String tableName, String colName)
+			throws TableKeysInvestigatorException {
 		Statement stmt;
-		Set<String> resultSet = new HashSet<String>();;
+		Set<String> resultSet = new HashSet<String>();
 		try {
 			stmt = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
 			ResultSet rs = stmt.executeQuery("select " + colName + " as charValue from " + tableName);
@@ -129,38 +106,99 @@ public class TableKeysInvestigator {
 		} catch (SQLException e) {
 			throw new TableKeysInvestigatorException(e.getMessage(), e);
 		}
-		
+
 		return resultSet;
 	}
 
-	private String getNextValidNumber(String tableName, String colName) throws TableKeysInvestigatorException {
-		int maxNumber;
-		if (numericKeyValueMap == null) {
-			numericKeyValueMap = new HashMap<String, Integer>();
-		}
-		if (!numericKeyValueMap.containsKey(tableName + "," + colName)) {
-			maxNumber = getMaxNumberValueInColFromDB(tableName, colName);
-			numericKeyValueMap.put(tableName + "," + colName, maxNumber);
-		} else {
-			maxNumber = numericKeyValueMap.get(tableName + "," + colName);
-		}
-		maxNumber++;
-		numericKeyValueMap.put(tableName + "," + colName, maxNumber);
-		return Integer.toString(maxNumber);
-	}
-
-	public List<String> getColumnNamesOfTable(String tableName) throws TableKeysInvestigatorException  {
-		List<String> colNames = new ArrayList<String>();
+	private Map<String, String> getColumnNamesTypeOfTable(String tableName) throws TableKeysInvestigatorException {
+		Map<String, String> colNamesType = new HashMap<String, String>();
 		ResultSet colNameSet;
 		try {
 			colNameSet = metaData.getColumns(null, null, tableName, null);
 			while (colNameSet.next()) {
-				colNames.add(colNameSet.getString("COLUMN_NAME"));
+				String colName = colNameSet.getString("COLUMN_NAME");
+				ResultSet column = metaData.getColumns(null, null, tableName, colName);
+				column.next();
+				colNamesType.put(colName, column.getString("TYPE_NAME") + "," + column.getString("COLUMN_SIZE"));
 			}
 		} catch (SQLException e) {
 			throw new TableKeysInvestigatorException(e.getMessage(), e);
-		}		
-		return colNames;
+		}
+		return colNamesType;
+	}
+
+	private Map<String, String> getUniqueColumnNames(String tableName, Set<String> primararyKeysNames)
+			throws TableKeysInvestigatorException {
+		Map<String, String> uniqueColNameTypeMap = new HashMap<String, String>();
+		try {
+			ResultSet rs = metaData.getIndexInfo(null, null, tableName, true, false);
+			while (rs.next()) {
+				String colName = rs.getString("COLUMN_NAME");
+				if (!primararyKeysNames.contains(colName)) {
+					ResultSet column = metaData.getColumns(null, null, tableName, colName);
+					column.next();
+					uniqueColNameTypeMap.put(colName,
+							column.getString("TYPE_NAME") + "," + column.getString("COLUMN_SIZE"));
+				}
+			}
+		} catch (SQLException e) {
+			throw new TableKeysInvestigatorException(e.getMessage(), e);
+		}
+		return uniqueColNameTypeMap;
+	}
+
+	private Map<String, Integer> getNumericValuesMapForKey(String keyType, String tableName)
+			throws TableKeysInvestigatorException {
+		Map<String, Integer> mapIntegerValues = new HashMap<String, Integer>();
+		if (keyType.equals("primaryKey")) {
+			Map<String, String> primaryKeyNameTypeMap = getPrimarykeysOfTable(tableName);
+			for (String keyName : primaryKeyNameTypeMap.keySet()) {
+				String typeOfKey = primaryKeyNameTypeMap.get(keyName);
+				if (typeOfKey.toLowerCase().contains("number") || typeOfKey.toLowerCase().contains("int")) {
+					mapIntegerValues.put(keyName, getMaxNumberValueInColFromDB(tableName, keyName));
+				}
+			}
+		} else if (keyType.equals("unique")) {
+			Map<String, String> primaryKeyNameTypeMap = getPrimarykeysOfTable(tableName);
+			Map<String, String> uniqueColNameTypeMap = getUniqueColumnNames(tableName, primaryKeyNameTypeMap.keySet());
+			for (String keyName : uniqueColNameTypeMap.keySet()) {
+				String typeOfKey = uniqueColNameTypeMap.get(keyName);
+				if (typeOfKey.toLowerCase().contains("number") || typeOfKey.toLowerCase().contains("int")) {
+					mapIntegerValues.put(keyName, getMaxNumberValueInColFromDB(tableName, keyName));
+				}
+			}
+		} else {
+			// Foreign Key
+
+		}
+		return mapIntegerValues;
+	}
+
+	private Map<String, Set<String>> getCharValuesMapForKey(String keyType, String tableName)
+			throws TableKeysInvestigatorException {
+		Map<String, Set<String>> mapCharValues = new HashMap<String, Set<String>>();
+		if (keyType.equals("primaryKey")) {
+			Map<String, String> primaryKeyNameTypeMap = getPrimarykeysOfTable(tableName);
+			for (String keyName : primaryKeyNameTypeMap.keySet()) {
+				String typeOfKey = primaryKeyNameTypeMap.get(keyName);
+				if (typeOfKey.toLowerCase().contains("char")) {
+					mapCharValues.put(keyName, getAllCharValuesInColumnFromDB(tableName, keyName));
+				}
+			}
+		} else if (keyType.equals("unique")) {
+			Map<String, String> primaryKeyNameTypeMap = getPrimarykeysOfTable(tableName);
+			Map<String, String> uniqueColNameTypeMap = getUniqueColumnNames(tableName, primaryKeyNameTypeMap.keySet());
+			for (String keyName : uniqueColNameTypeMap.keySet()) {
+				String typeOfKey = uniqueColNameTypeMap.get(keyName);
+				if (typeOfKey.toLowerCase().contains("char")) {
+					mapCharValues.put(keyName, getAllCharValuesInColumnFromDB(tableName, keyName));
+				}
+			}
+		} else {
+			// Foreign Key
+
+		}
+		return mapCharValues;
 	}
 
 }

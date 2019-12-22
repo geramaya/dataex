@@ -1,5 +1,109 @@
 package de.aspera.dataexport.util.dataset.editor;
 
-public class TableConstrainsDescription {
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import de.aspera.dataexport.dataFaker.DataFaker;
+
+public class TableConstrainsDescription {
+	private Map<String, String> columnNamesType;
+	private Map<String, Integer> numericUniqueColValueMap;
+	private Map<String, Set<String>> charUniqueColValueMap;
+	private Map<String, Integer> numericPrimaryKeyValueMap;
+	private Map<String, Set<String>> charPrimaryKeyValueMap;
+	private static final DataFaker faker = new DataFaker();
+
+	public void setUniqueNumericColTypeMap(Map<String, Integer> numericUniqueColValueMap) {
+		this.numericUniqueColValueMap = numericUniqueColValueMap;
+	}
+
+	public void setUniqueCharColTypeMap(Map<String, Set<String>> charUniqueColValueMap) {
+		this.charUniqueColValueMap = charUniqueColValueMap;
+	}
+
+	public void setNumericPrimaryKeyValueMap(Map<String, Integer> numericPrimaryKeyValueMap) {
+		this.numericPrimaryKeyValueMap = numericPrimaryKeyValueMap;
+	}
+
+	public void setCharPrimaryKeyValueMap(Map<String, Set<String>> charPrimaryKeyValueMap) {
+		this.charPrimaryKeyValueMap = charPrimaryKeyValueMap;
+	}
+
+	public void setColumnNamesType(Map<String, String> columnNamesType) {
+		this.columnNamesType = columnNamesType;
+	}
+
+	public List<String> getColNames() {
+		return new ArrayList<String>(columnNamesType.keySet());
+	}
+
+	public List<String> getPrimaryKeyNames() {
+		Set<String> combinedPrimary = new HashSet<String>();
+		combinedPrimary.addAll(charPrimaryKeyValueMap.keySet());
+		combinedPrimary.addAll(numericPrimaryKeyValueMap.keySet());
+		return new ArrayList<String>(combinedPrimary);
+	}
+
+	public List<String> getUniqueColNames() {
+		Set<String> combinedUniques = new HashSet<String>();
+		combinedUniques.addAll(charUniqueColValueMap.keySet());
+		combinedUniques.addAll(numericUniqueColValueMap.keySet());
+		return new ArrayList<String>(combinedUniques);
+	}
+
+	public List<String> getUniqueAndPrimaryColNames() {
+		Set<String> combinedAllUniques = new HashSet<String>();
+		combinedAllUniques.addAll(charUniqueColValueMap.keySet());
+		combinedAllUniques.addAll(numericUniqueColValueMap.keySet());
+		combinedAllUniques.addAll(charPrimaryKeyValueMap.keySet());
+		combinedAllUniques.addAll(numericPrimaryKeyValueMap.keySet());
+		return new ArrayList<String>(combinedAllUniques);
+	}
+
+	public String getValidUniqueKeyValue(String colName) throws TableKeysInvestigatorException {
+		if (!getUniqueAndPrimaryColNames().contains(colName)) {
+			// TODO: exceptions!!
+			throw new TableKeysInvestigatorException("column: " + colName + " not found in Unique Columns");
+		}
+		if (numericPrimaryKeyValueMap.containsKey(colName)|| numericUniqueColValueMap.containsKey(colName)) {
+			return getNextValidNumberUniqueKey(colName);
+		} else {
+			return getNextValidCharUniqueKey(colName);
+		}
+
+	}
+
+	private String getNextValidNumberUniqueKey(String colName) throws TableKeysInvestigatorException {
+		int current;
+		if(numericPrimaryKeyValueMap.containsKey(colName)) {
+			current = numericPrimaryKeyValueMap.get(colName);
+		}else {
+			current = numericUniqueColValueMap.get(colName);
+		}
+		numericPrimaryKeyValueMap.put(colName, ++current);
+		return Integer.toString(current);
+	}
+
+	private String getNextValidCharUniqueKey(String colName) throws TableKeysInvestigatorException {
+		String validStr;
+		String typeOfKey;
+		Set<String> valuesSet;
+		typeOfKey = columnNamesType.get(colName);
+		if(charPrimaryKeyValueMap.containsKey(colName)) {		
+			valuesSet = charPrimaryKeyValueMap.get(colName);
+		}else {
+			valuesSet = charUniqueColValueMap.get(colName);
+		}
+		
+		int strLength = Integer.parseInt(typeOfKey.split(",")[1]);
+		validStr = faker.fakeStringWithLength(strLength);
+		while (!valuesSet.add(validStr)) {
+			// TODO: make the implementation of the faker better
+			validStr = faker.fakeStringWithLength(strLength);
+		}
+		return validStr;
+	}
 }

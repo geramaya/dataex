@@ -37,7 +37,7 @@ public class DatasetEditorFacade {
 	}
 
 	public List<String> getTabelNames() {
-		return reader.getTabelNames();
+		return reader.getTableNames();
 	}
 
 	public int getRowCountOfTable(String tableName) {
@@ -56,31 +56,34 @@ public class DatasetEditorFacade {
 		return reader.getRowOfTable(tableName, row);
 	}
 
-	public void multiplyData(int factor) throws TableKeysInvestigatorException, DatasetReaderException, DatasetMultiplierException {
+	public void multiplyData(int factor)
+			throws TableKeysInvestigatorException, DatasetReaderException, DatasetMultiplierException {
 		reader.setDataset(multiplier.multiplyData(factor));
 	}
 
-	public void multiplyRowInTable(String tableName, int row, int factor) throws TableKeysInvestigatorException, DatasetReaderException, DatasetMultiplierException {
+	public void multiplyRowInTable(String tableName, int row, int factor)
+			throws TableKeysInvestigatorException, DatasetReaderException, DatasetMultiplierException {
 		reader.setDataset(multiplier.multiplyRowInTable(tableName, row, factor));
 	}
 
-	public void multiplyDataInTable(String tableName, int factor) throws TableKeysInvestigatorException, DatasetReaderException, DatasetMultiplierException{
+	public void multiplyDataInTable(String tableName, int factor)
+			throws TableKeysInvestigatorException, DatasetReaderException, DatasetMultiplierException {
 		reader.setDataset(multiplier.multiplyDataInTable(tableName, factor));
 	}
 
-	public void changeValuesInRow(String tableName, int row, Map<String, String> newValuesColName) throws DatasetReaderException, TableKeysInvestigatorException {
+	public void changeValuesInRow(String tableName, int row, Map<String, String> newValuesColName)
+			throws DatasetReaderException, TableKeysInvestigatorException, DatasetRowEditorException {
 		reader.setDataset(rowEditor.changeValuesInRow(tableName, row, newValuesColName));
 	}
 
-	public void addRow(String tableName, Map<String, String> newValuesColName) throws TableKeysInvestigatorException, DatasetReaderException{
+	public void addRow(String tableName, Map<String, String> newValuesColName)
+			throws TableKeysInvestigatorException, DatasetReaderException, DatasetRowEditorException {
 		reader.setDataset(rowEditor.addRow(tableName, newValuesColName));
 	}
 
 	public void setConnectionOfDB(Connection conn) throws TableKeysInvestigatorException {
 		tableInvestigator.setConnection(conn);
 		reader.setTableKeyInvestigator(tableInvestigator);
-		rowEditor.setTableKeyInvestigator(tableInvestigator);
-		multiplier.setTableKeyInvestigator(tableInvestigator);
 	}
 
 	public IDataSet getDataSet() {

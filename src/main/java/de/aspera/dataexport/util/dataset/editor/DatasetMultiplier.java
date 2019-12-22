@@ -1,7 +1,6 @@
 package de.aspera.dataexport.util.dataset.editor;
 
 import java.util.List;
-import java.util.Map;
 
 import org.dbunit.dataset.DataSetException;
 import org.dbunit.dataset.DefaultDataSet;
@@ -10,16 +9,16 @@ import org.dbunit.dataset.IDataSet;
 
 public class DatasetMultiplier {
 	private DatasetReader reader;
-	private TableKeysInvestigator tableInvestigator;
 
 	public DatasetMultiplier(DatasetReader reader) {
 		this.reader = reader;
 	}
 
-	public IDataSet multiplyData(int factor) throws TableKeysInvestigatorException, DatasetReaderException, DatasetMultiplierException {
+	public IDataSet multiplyData(int factor)
+			throws TableKeysInvestigatorException, DatasetReaderException, DatasetMultiplierException {
 		DefaultDataSet bigDataset = new DefaultDataSet();
-		List<String> tableNames = reader.getTabelNames();
-		Map<String, String> primaryKeys = null;
+		List<String> tableNames = reader.getTableNames();
+		List<String> uniqesOfTable = null;
 		try {
 			for (String tabName : tableNames) {
 				DefaultTable bigTable = new DefaultTable(reader.getMetaDataOfTable(tabName));
@@ -30,16 +29,15 @@ public class DatasetMultiplier {
 						bigTable.setValue(oldrow, colName, reader.getValueInTable(tabName, oldrow, colName));
 					}
 				}
-				if (tableInvestigator != null)
-					primaryKeys = tableInvestigator.getPrimarykeysOfTable(tabName);
+				uniqesOfTable = reader.getUniqueAndPrimaryColNames(tabName);
 				for (int y = 0; y < factor; y++) {
 					for (int i = 0; i < reader.getRowCountOfTable(tabName); i++) {
 						List<String> colNames = reader.getColumnNamesOfTable(tabName);
 						Object[] valuesOfRow = new Object[colNames.size()];
 						int j = 0;
 						for (String colName : colNames) {
-							if (primaryKeys != null && primaryKeys.keySet().contains(tabName + "," + colName)) {
-								valuesOfRow[j] = tableInvestigator.getValidPrimaryKeyValue(tabName, colName);
+							if (uniqesOfTable != null && uniqesOfTable.contains(colName)) {
+								valuesOfRow[j] = reader.getValidUniqueKeyValue(tabName, colName);
 							} else {
 								valuesOfRow[j] = reader.getValueInTable(tabName, i, colName);
 							}
@@ -56,10 +54,11 @@ public class DatasetMultiplier {
 		return bigDataset;
 	}
 
-	public IDataSet multiplyRowInTable(String tableName, int row, int factor) throws TableKeysInvestigatorException, DatasetReaderException, DatasetMultiplierException {
+	public IDataSet multiplyRowInTable(String tableName, int row, int factor)
+			throws TableKeysInvestigatorException, DatasetReaderException, DatasetMultiplierException {
 		DefaultDataSet bigDataset = new DefaultDataSet();
 		DefaultTable bigTable = new DefaultTable(reader.getMetaDataOfTable(tableName));
-		Map<String, String> primaryKeys = null;
+		List<String> uniqesOfTable = null;
 		try {
 			// Copy Old table
 			for (int oldrow = 0; oldrow < reader.getRowCountOfTable(tableName); oldrow++) {
@@ -68,15 +67,14 @@ public class DatasetMultiplier {
 					bigTable.setValue(oldrow, colName, reader.getValueInTable(tableName, oldrow, colName));
 				}
 			}
-			if (tableInvestigator != null)
-				primaryKeys = tableInvestigator.getPrimarykeysOfTable(tableName);
+			uniqesOfTable = reader.getUniqueAndPrimaryColNames(tableName);
 			for (int y = 0; y < factor; y++) {
 				List<String> colNames = reader.getColumnNamesOfTable(tableName);
 				Object[] valuesOfRow = new Object[colNames.size()];
 				int j = 0;
 				for (String colName : colNames) {
-					if (primaryKeys != null && primaryKeys.keySet().contains(tableName + "," + colName)) {
-						valuesOfRow[j] = tableInvestigator.getValidPrimaryKeyValue(tableName, colName);
+					if (uniqesOfTable != null && uniqesOfTable.contains(colName)) {
+						valuesOfRow[j] = reader.getValidUniqueKeyValue(tableName, colName);
 					} else {
 						valuesOfRow[j] = reader.getValueInTable(tableName, row, colName);
 					}
@@ -86,7 +84,7 @@ public class DatasetMultiplier {
 			}
 			bigDataset.addTable(bigTable);
 			// copy other tables into the new dataset
-			List<String> oldTableNames = reader.getTabelNames();
+			List<String> oldTableNames = reader.getTableNames();
 			for (String oldTableName : oldTableNames) {
 				if (!oldTableName.equalsIgnoreCase(tableName)) {
 					bigDataset.addTable(reader.getDataSet().getTable(oldTableName));
@@ -98,14 +96,10 @@ public class DatasetMultiplier {
 		return bigDataset;
 	}
 
-	public void setTableKeyInvestigator(TableKeysInvestigator tableInvestigator) {
-		this.tableInvestigator = tableInvestigator;
-
-	}
-
-	public IDataSet multiplyDataInTable(String tableName, int factor) throws TableKeysInvestigatorException, DatasetReaderException, DatasetMultiplierException {
+	public IDataSet multiplyDataInTable(String tableName, int factor)
+			throws TableKeysInvestigatorException, DatasetReaderException, DatasetMultiplierException {
 		DefaultDataSet bigDataset = new DefaultDataSet();
-		Map<String, String> primaryKeys = null;
+		List<String> uniqesOfTable = null;
 		DefaultTable bigTable = new DefaultTable(reader.getMetaDataOfTable(tableName));
 		try {
 			// Copy Old table
@@ -115,16 +109,15 @@ public class DatasetMultiplier {
 					bigTable.setValue(oldrow, colName, reader.getValueInTable(tableName, oldrow, colName));
 				}
 			}
-			if (tableInvestigator != null)
-				primaryKeys = tableInvestigator.getPrimarykeysOfTable(tableName);
+			uniqesOfTable = reader.getUniqueAndPrimaryColNames(tableName);
 			for (int y = 0; y < factor; y++) {
 				for (int i = 0; i < reader.getRowCountOfTable(tableName); i++) {
 					List<String> colNames = reader.getColumnNamesOfTable(tableName);
 					Object[] valuesOfRow = new Object[colNames.size()];
 					int j = 0;
 					for (String colName : colNames) {
-						if (primaryKeys != null && primaryKeys.keySet().contains(tableName + "," + colName)) {
-							valuesOfRow[j] = tableInvestigator.getValidPrimaryKeyValue(tableName, colName);
+						if (uniqesOfTable != null && uniqesOfTable.contains(colName)) {
+							valuesOfRow[j] = reader.getValidUniqueKeyValue(tableName, colName);
 						} else {
 							valuesOfRow[j] = reader.getValueInTable(tableName, i, colName);
 						}
@@ -135,7 +128,7 @@ public class DatasetMultiplier {
 			}
 			bigDataset.addTable(bigTable);
 			// copy other tables into the new dataset
-			List<String> oldTableNames = reader.getTabelNames();
+			List<String> oldTableNames = reader.getTableNames();
 			for (String oldTableName : oldTableNames) {
 				if (!oldTableName.equalsIgnoreCase(tableName)) {
 					bigDataset.addTable(reader.getDataSet().getTable(oldTableName));

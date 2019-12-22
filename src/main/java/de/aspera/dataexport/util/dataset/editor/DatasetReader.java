@@ -9,18 +9,16 @@ import java.util.Map;
 
 import org.dbunit.dataset.Column;
 import org.dbunit.dataset.DataSetException;
-import org.dbunit.dataset.DefaultDataSet;
-import org.dbunit.dataset.DefaultTable;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.ITable;
 import org.dbunit.dataset.ITableMetaData;
-import org.dbunit.dataset.datatype.DataType;
 import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
 
 public class DatasetReader {
 	private IDataSet dataset;
 	private Map<String, ITable> tablesMap;
 	private TableKeysInvestigator tableInvestigator;
+	private Map<String, TableConstrainsDescription> tablesConstraints;
 
 	public void readDataset(String filePath) throws DatasetReaderException {
 		try {
@@ -31,7 +29,7 @@ public class DatasetReader {
 		buildTableMap();
 	}
 
-	public List<String> getTabelNames() {
+	public List<String> getTableNames() {
 		return new ArrayList<String>(tablesMap.keySet());
 	}
 
@@ -98,88 +96,6 @@ public class DatasetReader {
 		return colNameValueMap;
 	}
 
-	public IDataSet exchangeRow(String tableName, int row, Map<String, String> colNameValueMap) throws DatasetReaderException {
-		DefaultTable table = new DefaultTable(getMetaDataOfTable(tableName));
-		DefaultDataSet editedDataSet = null;
-		try {
-			// Copy Old table
-			for (int oldrow = 0; oldrow < getRowCountOfTable(tableName); oldrow++) {
-				table.addRow();
-				for (String colName : getColumnNamesOfTable(tableName)) {
-					table.setValue(oldrow, colName, getValueInTable(tableName, oldrow, colName));
-				}
-			}
-			for (String colName : colNameValueMap.keySet()) {
-				table.setValue(row, colName, colNameValueMap.get(colName));
-			}
-			editedDataSet = new DefaultDataSet();
-			for (String name : getTabelNames()) {
-				if (name.equals(tableName)) {
-					editedDataSet.addTable(table);
-				} else {
-					editedDataSet.addTable(dataset.getTable(name));
-				}
-			}
-		} catch (DataSetException e) {
-			throw new DatasetReaderException(e.getMessage(), e);
-		}
-		return editedDataSet;
-	}
-
-	public IDataSet addRow(String tableName, Map<String, String> newValuesColName) throws TableKeysInvestigatorException, DatasetReaderException {
-		DefaultTable table;
-		DefaultDataSet editedDataSet = null;
-		ITableMetaData metaData = getMetaDataOfTable(tableName);
-		try {
-			// the table have no columns
-			if (metaData.getColumns().length == 0 && tableInvestigator != null) {
-				List<String> colNames = tableInvestigator.getColumnNamesOfTable(tableName);
-				Column[] cols = new Column[colNames.size()];
-				for (int i = 0; i < colNames.size(); i++) {
-					cols[i] = new Column(colNames.get(i), DataType.UNKNOWN);
-				}
-				table = new DefaultTable(tableName, cols);
-			} else {
-				table = new DefaultTable(metaData);
-			}
-			if (tableInvestigator != null) {
-				Map<String, String> tableColKeys = tableInvestigator.getPrimarykeysOfTable(tableName);
-				// get primary Keys of the Table and update the Values in the Map of Values
-				for (String key : tableColKeys.keySet()) {
-					String colName = key.split(",")[1];
-					newValuesColName.put(colName, tableInvestigator.getValidPrimaryKeyValue(tableName, colName));
-				}
-			}
-
-			// Copy Old table
-			for (int row = 0; row < getRowCountOfTable(tableName); row++) {
-				table.addRow();
-				for (String colName : getColumnNamesOfTable(tableName)) {
-					table.setValue(row, colName, getValueInTable(tableName, row, colName));
-				}
-			}
-			// add new Row at the end
-			int indexOfLastRow = table.getRowCount();
-			table.addRow();
-			for (String key : newValuesColName.keySet()) {
-				table.setValue(indexOfLastRow, key, newValuesColName.get(key));
-			}
-			// replace the old table in the dataset
-			editedDataSet = new DefaultDataSet();
-			for (String name : getTabelNames()) {
-				if (name.equals(tableName)) {
-					editedDataSet.addTable(table);
-				} else {
-					editedDataSet.addTable(dataset.getTable(name));
-				}
-			}
-		} catch (DataSetException e) {
-			throw new DatasetReaderException(e.getMessage(), e);
-		}
-
-		return editedDataSet;
-	}
-
 	public int getMaxNumberinColumnFromDataSet(String tableName, String colName) throws DatasetReaderException {
 		int numberOfRows = getRowCountOfTable(tableName);
 		int maxNum = 0;
@@ -196,8 +112,38 @@ public class DatasetReader {
 		return dataset;
 	}
 
-	public void setTableKeyInvestigator(TableKeysInvestigator tableInvestigator) {
+	public void setTableKeyInvestigator(TableKeysInvestigator tableInvestigator) throws TableKeysInvestigatorException {
 		this.tableInvestigator = tableInvestigator;
+		this.tablesConstraints = tableInvestigator.createTableConstrainsDescriptions(getTableNames());
+	}
 
+	public String getValidUniqueKeyValue(String tabName, String colName) throws TableKeysInvestigatorException {
+		return tablesConstraints.get(tabName).getValidUniqueKeyValue(colName);
+	}
+
+	// will be useful when using foreign keys
+	public List<String> getPrimarykeysOfTable(String tableName) throws TableKeysInvestigatorException {
+		if (tableInvestigator == null) {
+			throw new TableKeysInvestigatorException("table investigator is null!");
+		}
+		return tablesConstraints.get(tableName).getPrimaryKeyNames();
+	}
+
+	public List<String> getUniqueAndPrimaryColNames(String tableName) throws TableKeysInvestigatorException {
+		if (tableInvestigator == null) {
+			return null;
+		}
+		return tablesConstraints.get(tableName).getUniqueAndPrimaryColNames();
+	}
+
+	public boolean isTableInvestigatorNull() {
+		if (tableInvestigator == null)
+			return true;
+		else
+			return false;
+	}
+
+	public List<String> getColNamesOfTable(String tableName) {
+		return tablesConstraints.get(tableName).getColNames();
 	}
 }
