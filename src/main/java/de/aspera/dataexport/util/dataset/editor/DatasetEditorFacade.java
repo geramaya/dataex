@@ -29,7 +29,7 @@ public class DatasetEditorFacade {
 	public void readDataset(InputStream stream) throws DatasetEditorException, DatasetReaderException {
 		IDataSet dataset;
 		try {
-			dataset = new FlatXmlDataSetBuilder().build(stream);
+			dataset = new FlatXmlDataSetBuilder().setColumnSensing(true).build(stream);
 			reader.setDataset(dataset);
 		} catch (DataSetException e) {
 			throw new DatasetEditorException(e.getMessage(), e);

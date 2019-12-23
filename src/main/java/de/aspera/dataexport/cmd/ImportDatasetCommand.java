@@ -45,7 +45,7 @@ public class ImportDatasetCommand implements CommandRunnable {
 				filePath = cleanOption;
 			}
 			dataConnection = connectionRepo.getJsonDatabases(cmdContext.nextArgument());
-			IDataSet dataSet = new FlatXmlDataSetBuilder().build(new FileInputStream(filePath));
+			IDataSet dataSet = new FlatXmlDataSetBuilder().setColumnSensing(true).build(new FileInputStream(filePath));
 			IDatabaseConnection connection = getConnection(dataConnection);
 			if (cleanInsert) {
 				DatabaseOperation.CLEAN_INSERT.execute(connection, dataSet);
