@@ -31,7 +31,6 @@ import de.aspera.dataexport.util.json.JsonDatabase;
 
 public class ImportDatasetCommand implements CommandRunnable {
 	private static final Logger LOGGER = Logger.getLogger(ImportDatasetCommand.class.getName());
-	private static final String BLANK = " ";
 	private static final Scanner scanner = new Scanner(System.in);
 	private CommandContext cmdContext;
 	private JsonConnectionHolder connectionRepo;
@@ -70,7 +69,7 @@ public class ImportDatasetCommand implements CommandRunnable {
 					tableInvestigator.enableFKeyConstriantCheck();
 				}
 			} else {
-				DatabaseOperation.INSERT.execute(connection, dataSet);
+				DatabaseOperation.REFRESH.execute(connection, dataSet);
 			}
 		} catch (Exception e) {
 			throw new CommandException(e.getMessage(), e);
