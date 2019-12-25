@@ -14,10 +14,20 @@ public class TableConstrainsDescription {
 	private Map<String, Set<String>> charUniqueColValueMap;
 	private Map<String, Integer> numericPrimaryKeyValueMap;
 	private Map<String, Set<String>> charPrimaryKeyValueMap;
+	private Map<String, Set<String>> referencedFromTables;
+	private Map<String, Set<String>> referencesToTables;
 	private static final DataFaker faker = new DataFaker();
 
 	public void setUniqueNumericColTypeMap(Map<String, Integer> numericUniqueColValueMap) {
 		this.numericUniqueColValueMap = numericUniqueColValueMap;
+	}
+
+	public void setReferencedFromTables(Map<String, Set<String>> referencedFromTables) {
+		this.referencedFromTables = referencedFromTables;
+	}
+
+	public void setReferencesToTables(Map<String, Set<String>> referencesToTables) {
+		this.referencesToTables = referencesToTables;
 	}
 
 	public void setUniqueCharColTypeMap(Map<String, Set<String>> charUniqueColValueMap) {
@@ -34,6 +44,14 @@ public class TableConstrainsDescription {
 
 	public void setColumnNamesType(Map<String, String> columnNamesType) {
 		this.columnNamesType = columnNamesType;
+	}
+
+	public Set<String> getReferencedFromTables() {
+		Set<String> combinedTableNames = new HashSet<String>();
+		for (String colName : referencedFromTables.keySet()) {
+			combinedTableNames.addAll(referencedFromTables.get(colName));
+		}
+		return combinedTableNames;
 	}
 
 	public List<String> getColNames() {
@@ -68,7 +86,7 @@ public class TableConstrainsDescription {
 			// TODO: exceptions!!
 			throw new TableKeysInvestigatorException("column: " + colName + " not found in Unique Columns");
 		}
-		if (numericPrimaryKeyValueMap.containsKey(colName)|| numericUniqueColValueMap.containsKey(colName)) {
+		if (numericPrimaryKeyValueMap.containsKey(colName) || numericUniqueColValueMap.containsKey(colName)) {
 			return getNextValidNumberUniqueKey(colName);
 		} else {
 			return getNextValidCharUniqueKey(colName);
@@ -78,9 +96,9 @@ public class TableConstrainsDescription {
 
 	private String getNextValidNumberUniqueKey(String colName) throws TableKeysInvestigatorException {
 		int current;
-		if(numericPrimaryKeyValueMap.containsKey(colName)) {
+		if (numericPrimaryKeyValueMap.containsKey(colName)) {
 			current = numericPrimaryKeyValueMap.get(colName);
-		}else {
+		} else {
 			current = numericUniqueColValueMap.get(colName);
 		}
 		numericPrimaryKeyValueMap.put(colName, ++current);
@@ -92,12 +110,12 @@ public class TableConstrainsDescription {
 		String typeOfKey;
 		Set<String> valuesSet;
 		typeOfKey = columnNamesType.get(colName);
-		if(charPrimaryKeyValueMap.containsKey(colName)) {		
+		if (charPrimaryKeyValueMap.containsKey(colName)) {
 			valuesSet = charPrimaryKeyValueMap.get(colName);
-		}else {
+		} else {
 			valuesSet = charUniqueColValueMap.get(colName);
 		}
-		
+
 		int strLength = Integer.parseInt(typeOfKey.split(",")[1]);
 		validStr = faker.fakeStringWithLength(strLength);
 		while (!valuesSet.add(validStr)) {

@@ -33,6 +33,30 @@ public class TableKeysInvestigator {
 		this.metaData = metaData;
 	}
 
+	public void disableFKeyConstriantCheck() throws TableKeysInvestigatorException {
+		Statement stmt;
+		try {
+			if (metaData.getDatabaseProductName().contains("MySQL")) {
+				stmt = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+				stmt.execute("SET FOREIGN_KEY_CHECKS=0;");
+			}
+		} catch (SQLException e) {
+			throw new TableKeysInvestigatorException(e.getMessage(), e);
+		}
+	}
+
+	public void enableFKeyConstriantCheck() throws TableKeysInvestigatorException {
+		Statement stmt;
+		try {
+			if (metaData.getDatabaseProductName().contains("MySQL")) {
+				stmt = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+				stmt.execute("SET FOREIGN_KEY_CHECKS=1;");
+			}
+		} catch (SQLException e) {
+			throw new TableKeysInvestigatorException(e.getMessage(), e);
+		}
+	}
+
 	public HashMap<String, TableConstrainsDescription> createTableConstrainsDescriptions(List<String> tabelNames)
 			throws TableKeysInvestigatorException {
 		HashMap<String, TableConstrainsDescription> tableConstrians = new HashMap<String, TableConstrainsDescription>();
@@ -43,12 +67,62 @@ public class TableKeysInvestigator {
 			tabDescription.setCharPrimaryKeyValueMap(getCharValuesMapForKey("primaryKey", tabName));
 			tabDescription.setUniqueCharColTypeMap(getCharValuesMapForKey("unique", tabName));
 			tabDescription.setUniqueNumericColTypeMap(getNumericValuesMapForKey("unique", tabName));
+			tabDescription.setReferencedFromTables(getReferencedFromTables(tabName));
+			tabDescription.setReferencesToTables(getReferencesToTables(tabName));
 			// last step
-			keyTypeMap=null;
+			keyTypeMap = null;
 			tableConstrians.put(tabName, tabDescription);
 		}
 		return tableConstrians;
 
+	}
+
+	private Map<String, Set<String>> getReferencesToTables(String tabName) throws TableKeysInvestigatorException {
+		Map<String, Set<String>> referencesToTabCol = new HashMap<String, Set<String>>();
+		Set<String> fKeyTabColNames;
+		try {
+			ResultSet set = metaData.getImportedKeys(null, null, tabName);
+			while (set.next()) {
+				String pkTable = set.getString("PKTABLE_NAME");
+				String pkcolname = set.getString("PKCOLUMN_NAME");
+				String fkCol = set.getString("FKCOLUMN_NAME");
+				if (referencesToTabCol.containsKey(fkCol)) {
+					referencesToTabCol.get(fkCol).add(pkTable + "." + pkcolname);
+				} else {
+					fKeyTabColNames = new HashSet<String>();
+					fKeyTabColNames.add(pkTable + "." + pkcolname);
+					referencesToTabCol.put(fkCol, fKeyTabColNames);
+				}
+			}
+		} catch (SQLException e) {
+			throw new TableKeysInvestigatorException(e.getMessage(), e);
+		}
+
+		return referencesToTabCol;
+	}
+
+	private Map<String, Set<String>> getReferencedFromTables(String tabName) throws TableKeysInvestigatorException {
+		Map<String, Set<String>> referencedFromTabCol = new HashMap<String, Set<String>>();
+		Set<String> fKeyTabColNames;
+		try {
+			ResultSet set = metaData.getExportedKeys(null, null, tabName);
+			while (set.next()) {
+				String colname = set.getString("PKCOLUMN_NAME");
+				String fkTable = set.getString("FKTABLE_NAME");
+				String fkCol = set.getString("FKCOLUMN_NAME");
+				if (referencedFromTabCol.containsKey(colname)) {
+					referencedFromTabCol.get(colname).add(fkTable + "." + fkCol);
+				} else {
+					fKeyTabColNames = new HashSet<String>();
+					fKeyTabColNames.add(fkTable + "." + fkCol);
+					referencedFromTabCol.put(colname, fKeyTabColNames);
+				}
+			}
+		} catch (SQLException e) {
+			throw new TableKeysInvestigatorException(e.getMessage(), e);
+		}
+
+		return referencedFromTabCol;
 	}
 
 	private Map<String, String> getPrimarykeysOfTable(String tableName) throws TableKeysInvestigatorException {
