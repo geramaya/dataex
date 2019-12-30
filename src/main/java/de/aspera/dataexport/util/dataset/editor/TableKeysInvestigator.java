@@ -77,22 +77,15 @@ public class TableKeysInvestigator {
 
 	}
 
-	private Map<String, Set<String>> getReferencesToTables(String tabName) throws TableKeysInvestigatorException {
-		Map<String, Set<String>> referencesToTabCol = new HashMap<String, Set<String>>();
-		Set<String> fKeyTabColNames;
+	private Map<String, String> getReferencesToTables(String tabName) throws TableKeysInvestigatorException {
+		Map<String, String> referencesToTabCol = new HashMap<String, String>();
 		try {
 			ResultSet set = metaData.getImportedKeys(null, null, tabName);
 			while (set.next()) {
 				String pkTable = set.getString("PKTABLE_NAME");
 				String pkcolname = set.getString("PKCOLUMN_NAME");
 				String fkCol = set.getString("FKCOLUMN_NAME");
-				if (referencesToTabCol.containsKey(fkCol)) {
-					referencesToTabCol.get(fkCol).add(pkTable + "." + pkcolname);
-				} else {
-					fKeyTabColNames = new HashSet<String>();
-					fKeyTabColNames.add(pkTable + "." + pkcolname);
-					referencesToTabCol.put(fkCol, fKeyTabColNames);
-				}
+				referencesToTabCol.put(fkCol, pkTable + "." + pkcolname);
 			}
 		} catch (SQLException e) {
 			throw new TableKeysInvestigatorException(e.getMessage(), e);

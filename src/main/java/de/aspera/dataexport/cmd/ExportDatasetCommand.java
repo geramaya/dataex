@@ -53,7 +53,7 @@ public class ExportDatasetCommand implements CommandRunnable {
 			dataConnection = connectionRepo.getJsonDatabases(exportCommand.getConnId());
 			FileOutputStream fileOut = null;
 			File file;
-			exportStream = ExporterController.startExportForTable(dataConnection, exportCommand);
+			exportStream = ExporterController.startExportForTable(dataConnection, exportCommand,false);
 			file = new File(exportCommand.getExportedFilePath().concat(
 						File.separator +"DataSet-Table-" + exportCommand.getCommandId() + "-" + dataConnection.getIdent() + ".xml"));
 			fileOut = new FileOutputStream(file);

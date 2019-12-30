@@ -73,7 +73,10 @@ public class DatasetReader {
 
 	}
 
-	public ITableMetaData getMetaDataOfTable(String tableName) {
+	public ITableMetaData getMetaDataOfTable(String tableName) throws DatasetReaderException {
+		if (tablesMap.get(tableName) == null) {
+			throw new DatasetReaderException("Table does not exist in the Dataset");
+		}
 		return tablesMap.get(tableName).getTableMetaData();
 	}
 
@@ -145,5 +148,9 @@ public class DatasetReader {
 
 	public List<String> getColNamesOfTable(String tableName) {
 		return tablesConstraints.get(tableName).getColNames();
+	}
+
+	public Map<String, String> getReferencesToTables(String tableName) {
+		return tablesConstraints.get(tableName).getReferencesToTables();
 	}
 }

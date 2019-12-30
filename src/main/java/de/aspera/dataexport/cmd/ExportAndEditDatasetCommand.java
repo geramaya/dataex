@@ -74,7 +74,7 @@ public class ExportAndEditDatasetCommand implements CommandRunnable {
 		}
 		dataConnection = connectionRepo.getJsonDatabases(exportCommand.getConnId());
 		try {
-			exportStream = ExporterController.startExportForTable(dataConnection, exportCommand);
+			exportStream = ExporterController.startExportForTable(dataConnection, exportCommand,true);
 		} catch (DatabaseUnitException | SQLException e) {
 			throw new CommandException(e.getMessage(), e);
 		} finally {

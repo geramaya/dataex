@@ -15,7 +15,7 @@ public class TableConstrainsDescription {
 	private Map<String, Integer> numericPrimaryKeyValueMap;
 	private Map<String, Set<String>> charPrimaryKeyValueMap;
 	private Map<String, Set<String>> referencedFromTables;
-	private Map<String, Set<String>> referencesToTables;
+	private Map<String, String> referencesToTables;
 	private static final DataFaker faker = new DataFaker();
 
 	public void setUniqueNumericColTypeMap(Map<String, Integer> numericUniqueColValueMap) {
@@ -26,7 +26,7 @@ public class TableConstrainsDescription {
 		this.referencedFromTables = referencedFromTables;
 	}
 
-	public void setReferencesToTables(Map<String, Set<String>> referencesToTables) {
+	public void setReferencesToTables(Map<String, String> referencesToTables) {
 		this.referencesToTables = referencesToTables;
 	}
 
@@ -52,6 +52,10 @@ public class TableConstrainsDescription {
 			combinedTableNames.addAll(referencedFromTables.get(colName));
 		}
 		return combinedTableNames;
+	}
+	
+	public Map<String,String> getReferencesToTables() {
+		return referencesToTables;
 	}
 
 	public List<String> getColNames() {

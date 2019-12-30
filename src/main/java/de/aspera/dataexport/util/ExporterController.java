@@ -35,7 +35,7 @@ public class ExporterController {
 	 * @throws SQLException
 	 */
 	public static ByteArrayOutputStream startExportForTable(JsonDatabase databaseConnection,
-			ExportJsonCommand exportCommand) throws DatabaseUnitException, SQLException {
+			ExportJsonCommand exportCommand, boolean editable) throws DatabaseUnitException, SQLException {
 		List<TableDescriptor> descriptors = new ArrayList<>();
 		if (databaseConnection == null)
 			throw new IllegalArgumentException("The databaseConnection can not be null");
@@ -53,7 +53,7 @@ public class ExporterController {
 					descriptor.addField("*");
 			descriptors.add(descriptor);
 		}
-		return exporter.exportDataSet(descriptors);
+		return exporter.exportDataSet(descriptors, editable);
 	}
 
 	public static void readJsonDatabaseFile() throws JsonConnectionReadException {
