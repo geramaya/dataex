@@ -71,7 +71,7 @@ public class DataSetExporterTest extends BasicFacadeTest {
 		tables.add(table);
 		command.setTables(tables);
 		
-		ByteArrayOutputStream resultStream = ExporterController.startExportForTable(connectionData, command);
+		ByteArrayOutputStream resultStream = ExporterController.startExportForTable(connectionData, command,false);
 		assertNotNull("Did not create output stream!", resultStream);
 		String content = resultStream.toString();
 		assertTrue("Did not export the right table!", content.contains("Michael"));

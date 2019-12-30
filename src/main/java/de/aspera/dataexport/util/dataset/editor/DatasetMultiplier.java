@@ -1,6 +1,8 @@
 package de.aspera.dataexport.util.dataset.editor;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 import org.dbunit.dataset.DataSetException;
 import org.dbunit.dataset.DefaultDataSet;
@@ -48,6 +50,7 @@ public class DatasetMultiplier {
 				}
 				bigDataset.addTable(bigTable);
 			}
+			maintainDataIntegrity(bigDataset);
 		} catch (DataSetException e) {
 			throw new DatasetMultiplierException(e.getMessage(), e);
 		}
@@ -134,9 +137,57 @@ public class DatasetMultiplier {
 					bigDataset.addTable(reader.getDataSet().getTable(oldTableName));
 				}
 			}
+			maintainDataIntegrity(bigDataset);
 		} catch (DataSetException e) {
 			throw new DatasetMultiplierException(e.getMessage(), e);
 		}
 		return bigDataset;
 	}
+
+	private void maintainDataIntegrity(DefaultDataSet bigDataset) throws TableKeysInvestigatorException {
+		DefaultTable table = null;
+		DefaultTable referencedTable = null;
+		for (String tableName : reader.getTableNames()) {
+			Map<String, String> refrences = reader.getReferencesToTables(tableName);
+			for (String colName : refrences.keySet()) {
+				String referencedTableName = refrences.get(colName).split("\\.")[0];
+				String referencedColName = refrences.get(colName).split("\\.")[1];
+				try {
+					if (reader.getTableNames().contains(referencedTableName)) {
+						table = (DefaultTable) bigDataset.getTable(tableName);
+						referencedTable = (DefaultTable) bigDataset.getTable(referencedTableName);
+						int indexOfRow = reader.getRowCountOfTable(tableName);
+						int rowIndexOfRefTable = reader.getRowCountOfTable(referencedTableName);
+						Random random = new Random();
+						int randomNum = random.nextInt(referencedTable.getRowCount() / 3);
+						List<String> uniques = reader.getUniqueAndPrimaryColNames(tableName);
+						int j = 0;
+						for (int i = indexOfRow; i < table.getRowCount(); i++) {
+							Object referencedValue = referencedTable.getValue(rowIndexOfRefTable, referencedColName);
+							table.setValue(i, colName, referencedValue);
+							if (uniques.contains(colName)) {
+								// 1:1 Relation
+								if (rowIndexOfRefTable < referencedTable.getRowCount())
+									rowIndexOfRefTable++;
+								else
+									break;
+							} else if (j == randomNum && rowIndexOfRefTable < referencedTable.getRowCount()) {
+								// 1:N Relation
+								rowIndexOfRefTable++;
+								j = 0;
+							}
+							j++;
+						}
+					}
+				} catch (DataSetException e) {
+					// Ignore the Exception if the referenced Table does not exist in dataset
+					if (referencedTable != null)
+						throw new TableKeysInvestigatorException(e.getMessage(), e);
+
+				}
+			}
+		}
+
+	}
+
 }

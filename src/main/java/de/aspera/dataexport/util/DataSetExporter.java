@@ -11,6 +11,7 @@ import org.dbunit.database.AmbiguousTableNameException;
 import org.dbunit.database.IDatabaseConnection;
 import org.dbunit.dataset.DataSetException;
 import org.dbunit.dataset.xml.FlatXmlDataSet;
+import org.dbunit.dataset.xml.XmlDataSet;
 import org.dbunit.ext.h2.H2Connection;
 import org.dbunit.ext.mssql.MsSqlConnection;
 import org.dbunit.ext.mysql.MySqlConnection;
@@ -44,7 +45,7 @@ public class DataSetExporter {
 	 * @throws DatabaseUnitException
 	 * @throws SQLException
 	 */
-	public ByteArrayOutputStream exportDataSet(List<TableDescriptor> descriptors)
+	public ByteArrayOutputStream exportDataSet(List<TableDescriptor> descriptors, boolean editable)
 			throws DatabaseUnitException, SQLException {
 
 		IDatabaseConnection conn = null;
@@ -69,7 +70,11 @@ public class DataSetExporter {
 
 		try {
 			outputStream = new ByteArrayOutputStream();
-			FlatXmlDataSet.write(partialDataSet, outputStream);
+			if(editable) {
+				XmlDataSet.write(partialDataSet, outputStream);
+			}else {
+				FlatXmlDataSet.write(partialDataSet, outputStream);
+			}
 		} catch (DataSetException e) {
 			logger.error("can not export the dataset", e);
 		} catch (IOException e) {

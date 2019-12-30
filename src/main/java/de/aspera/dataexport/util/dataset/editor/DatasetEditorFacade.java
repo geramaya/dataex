@@ -8,6 +8,7 @@ import java.util.Map;
 import org.dbunit.dataset.DataSetException;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
+import org.dbunit.dataset.xml.XmlDataSet;
 
 public class DatasetEditorFacade {
 	private DatasetReader reader;
@@ -29,7 +30,7 @@ public class DatasetEditorFacade {
 	public void readDataset(InputStream stream) throws DatasetEditorException, DatasetReaderException {
 		IDataSet dataset;
 		try {
-			dataset = new FlatXmlDataSetBuilder().setColumnSensing(true).build(stream);
+			dataset = new XmlDataSet(stream);
 			reader.setDataset(dataset);
 		} catch (DataSetException e) {
 			throw new DatasetEditorException(e.getMessage(), e);
