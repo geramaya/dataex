@@ -89,8 +89,11 @@ public class ImportDatasetCommand implements CommandRunnable {
 				LOGGER.log(Level.INFO, msg);
 			}
 		}
-		System.out.print("\n>> Are you sure you want to continue (Y/N): ");
-		String cmdline = scanner.nextLine().trim();
+		String cmdline="";
+		while(!cmdline.equalsIgnoreCase("y")&!cmdline.equalsIgnoreCase("n")) {
+			System.out.print("\n>> Are you sure you want to continue (Y/N): ");
+			cmdline = scanner.nextLine().trim();
+		}
 		if (cmdline.equalsIgnoreCase("y")) {
 			resumedWithCleanInsert = true;
 		}

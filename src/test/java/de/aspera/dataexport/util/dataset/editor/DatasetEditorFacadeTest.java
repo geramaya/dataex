@@ -45,7 +45,7 @@ public class DatasetEditorFacadeTest {
 		FileOutputStream out = new FileOutputStream(file);
 		FlatXmlDataSet.write(dataset, out);
 		editorFacade.readDataset(file.getAbsolutePath());
-		assertEquals(1, editorFacade.getTabelNames().size(), "tables of the dataset were not correctly read from file");
+		assertEquals(1, editorFacade.getTableNames().size(), "tables of the dataset were not correctly read from file");
 		assertEquals(3, editorFacade.getColumnNamesOfTable("test-table").size(), "columns of the dataset were not correctly read from file");
 	}
 	
@@ -56,7 +56,7 @@ public class DatasetEditorFacadeTest {
 		FlatXmlDataSet.write(dataset, out);
 		FileInputStream in = new FileInputStream(file);
 		editorFacade.readDataset(in);
-		assertEquals(1, editorFacade.getTabelNames().size(), "tables of the dataset were not correctly read from stream");
+		assertEquals(1, editorFacade.getTableNames().size(), "tables of the dataset were not correctly read from stream");
 		assertEquals(3, editorFacade.getColumnNamesOfTable("test-table").size(), "columns of the dataset were not correctly read from stream");
 	}
 

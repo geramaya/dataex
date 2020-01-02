@@ -3,8 +3,12 @@ package de.aspera.dataexport.cmd;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -15,6 +19,7 @@ import de.aspera.dataexport.dao.ConfigFacade;
 import de.aspera.dataexport.dao.DatabaseException;
 import de.aspera.dataexport.dto.Config;
 import de.aspera.dataexport.util.Resources;
+import de.aspera.dataexport.util.dataset.editor.DatasetEditorFacade;
 import de.aspera.dataexport.util.json.ExportJsonCommand;
 import de.aspera.dataexport.util.json.JsonDatabase;
 import de.aspera.dataexport.util.json.TableQuery;
@@ -48,9 +53,41 @@ public class ConfigInitCommand implements CommandRunnable {
 			}
 			// write initial Command and Connection files for export Command
 			writeJsonExportFiles();
+			// write Groovy file
+			writeGroovyEditFile();
 		} catch (DatabaseException | IOException e) {
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		}
+	}
+
+	private void writeGroovyEditFile() throws IOException {
+		String declaration = "/** please use the following methods to edit your Dataset! **/";
+		String[] methodDeclaration = {
+				"multiplyData(int factor): to multiply the number of rows in each table in the Dataset by the given factor",
+				"multiplyRowInTable(String tableName, int row, int factor): to multiply a specific row inside a table",
+				"multiplyDataInTable(String tableName, int factor): to multiply the number of rows in a specific table ",
+				"changeValuesInRow(String tableName, int row, Map<String, String> newValuesColName): to change the vlues of a specific row",
+				"addRow(String tableName, Map<String, String> newValuesColName): to add row to a table",
+				"setRandomFields(List<String> fields): to define which columns to have random values in the table. They should be defined as follows : 'TableName.ColumnName'",
+				"randomizeValues(): to randomize the values of the defined columns in each table in the Dataset.",
+				"randomizeValues(String tableName): to randomize the values of the defined columns in a specific table" };
+		String clz = "\nimport de.aspera.dataexport.util.dataset.editor.DatasetEditorFacade;\n" + "class Script {\r\n"
+				+ "\r\n" + "     void runScript(DatasetEditorFacade facade) {\n" + "\r}\n}";
+
+		String filePath = System.getProperty("user.home") + File.separator + "." + PROJECT_NAME + File.separator
+				+ "GroovyScript.groovy";
+		File file = new File(filePath);
+		if(!file.exists()) {
+			FileWriter fileWriter = new FileWriter(filePath);
+			fileWriter.write(declaration+"\n");
+			fileWriter.write("/*"+"\n");
+			for (int i = 0; i < methodDeclaration.length; i++) {
+				fileWriter.write("*" + methodDeclaration[i]+"\n");
+			}
+			fileWriter.write("*/"+"\n");
+			fileWriter.write(clz);
+			fileWriter.close();
+		}		
 	}
 
 	private void writeJsonExportFiles() throws IOException {
@@ -82,8 +119,8 @@ public class ConfigInitCommand implements CommandRunnable {
 			fileWriter.close();
 		}
 		// Write Command file
-		filePath = System.getProperty("user.home") + File.separator + "." + Resources.PROJECT_NAME
-				+ File.separator + "dataExporter_ExportCommands.json";
+		filePath = System.getProperty("user.home") + File.separator + "." + Resources.PROJECT_NAME + File.separator
+				+ "dataExporter_ExportCommands.json";
 		file = new File(filePath);
 		if (!file.exists()) {
 			fileWriter = new FileWriter(file);

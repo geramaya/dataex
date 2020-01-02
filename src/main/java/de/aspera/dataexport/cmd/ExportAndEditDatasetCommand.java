@@ -41,8 +41,9 @@ public class ExportAndEditDatasetCommand implements CommandRunnable {
 	@Override
 	public void run() throws CommandException {
 		init();
-		startExportFromDataBase();
-		startEditingDataset();
+		boolean executed = startExportFromDataBase();
+		if (executed)
+			startEditingDataset();
 
 	}
 
@@ -61,20 +62,21 @@ public class ExportAndEditDatasetCommand implements CommandRunnable {
 		}
 	}
 
-	private void startExportFromDataBase() throws CommandException {
+	private boolean startExportFromDataBase() throws CommandException {
 		String commandId = cmdContext.nextArgument();
 		if (StringUtils.isEmpty(commandId)) {
 			LOGGER.log(Level.WARNING, "A commandId is required to proceed!");
-			return;
+			return false;
 		}
 		exportCommand = commandRepo.getCommand(commandId);
 		if (exportCommand == null) {
 			LOGGER.log(Level.WARNING, "Your commandId:\"{0}\" could not found!", commandId);
-			return;
+			return false;
 		}
 		dataConnection = connectionRepo.getJsonDatabases(exportCommand.getConnId());
 		try {
-			exportStream = ExporterController.startExportForTable(dataConnection, exportCommand,true);
+			exportStream = ExporterController.startExportForTable(dataConnection, exportCommand, true);
+			return true;
 		} catch (DatabaseUnitException | SQLException e) {
 			throw new CommandException(e.getMessage(), e);
 		} finally {

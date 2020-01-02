@@ -38,7 +38,7 @@ public class DatasetEditorFacade {
 		}
 	}
 
-	public List<String> getTabelNames() {
+	public List<String> getTableNames() {
 		return reader.getTableNames();
 	}
 
