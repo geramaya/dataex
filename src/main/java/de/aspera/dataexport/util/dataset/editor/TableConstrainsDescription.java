@@ -16,6 +16,16 @@ public class TableConstrainsDescription {
 	private Map<String, Set<String>> charPrimaryKeyValueMap;
 	private Map<String, Set<String>> referencedFromTables;
 	private Map<String, String> referencesToTables;
+	private Set<String> randomFields;
+
+	public Set<String> getRandomFields() {
+		return randomFields;
+	}
+
+	public void setRandomFields(Set<String> randomFields) {
+		this.randomFields = randomFields;
+	}
+
 	private static final DataFaker faker = new DataFaker();
 
 	public void setUniqueNumericColTypeMap(Map<String, Integer> numericUniqueColValueMap) {
@@ -53,8 +63,8 @@ public class TableConstrainsDescription {
 		}
 		return combinedTableNames;
 	}
-	
-	public Map<String,String> getReferencesToTables() {
+
+	public Map<String, String> getReferencesToTables() {
 		return referencesToTables;
 	}
 

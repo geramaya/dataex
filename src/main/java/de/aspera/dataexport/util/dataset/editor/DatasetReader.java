@@ -4,8 +4,10 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.dbunit.dataset.Column;
 import org.dbunit.dataset.DataSetException;
@@ -152,5 +154,30 @@ public class DatasetReader {
 
 	public Map<String, String> getReferencesToTables(String tableName) {
 		return tablesConstraints.get(tableName).getReferencesToTables();
+	}
+
+	public void setRandomFields(List<String> fields) {
+		for(String str : fields) {
+			String tabName = str.split("\\.")[0];
+			String fieldName = str.split("\\.")[1];
+			TableConstrainsDescription tabCons= tablesConstraints.get(tabName);
+			if(tabCons!=null) {
+				if(tabCons.getRandomFields()!=null) {
+					tabCons.getRandomFields().add(fieldName);
+				}else {
+					Set<String> fieldSet = new HashSet<String>();
+					fieldSet.add(fieldName);
+					tabCons.setRandomFields(fieldSet);
+				}
+			}
+		}
+	}
+	
+	public List<String> getRandomFields(String tableName) throws DatasetReaderException{
+		Set<String> randomFields = tablesConstraints.get(tableName).getRandomFields();
+		if(randomFields==null) {
+			throw new DatasetReaderException("Random fields are not defined for table: "+tableName);
+		}
+		return new ArrayList<String>(randomFields); 
 	}
 }

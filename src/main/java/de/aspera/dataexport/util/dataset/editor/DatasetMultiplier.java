@@ -183,7 +183,6 @@ public class DatasetMultiplier {
 					// Ignore the Exception if the referenced Table does not exist in dataset
 					if (referencedTable != null)
 						throw new TableKeysInvestigatorException(e.getMessage(), e);
-
 				}
 			}
 		}

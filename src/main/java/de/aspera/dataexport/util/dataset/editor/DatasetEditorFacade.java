@@ -7,7 +7,6 @@ import java.util.Map;
 
 import org.dbunit.dataset.DataSetException;
 import org.dbunit.dataset.IDataSet;
-import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
 import org.dbunit.dataset.xml.XmlDataSet;
 
 public class DatasetEditorFacade {
@@ -15,11 +14,13 @@ public class DatasetEditorFacade {
 	private DatasetMultiplier multiplier;
 	private DatasetRowEditor rowEditor;
 	private TableKeysInvestigator tableInvestigator;
+	private DatasetRandomizer randomizer;
 
 	public DatasetEditorFacade() {
 		this.reader = new DatasetReader();
 		this.multiplier = new DatasetMultiplier(reader);
 		this.rowEditor = new DatasetRowEditor(reader);
+		this.randomizer = new DatasetRandomizer(reader);
 		this.tableInvestigator = new TableKeysInvestigator();
 	}
 
@@ -85,6 +86,18 @@ public class DatasetEditorFacade {
 	public void setConnectionOfDB(Connection conn) throws TableKeysInvestigatorException {
 		tableInvestigator.setConnection(conn);
 		reader.setTableKeyInvestigator(tableInvestigator);
+	}
+
+	public void setRandomFields(List<String> fields) {
+		reader.setRandomFields(fields);
+	}
+
+	public void randomizeValues() throws DatasetReaderException, DatasetRandomizerException {
+		reader.setDataset(randomizer.randomizeValues());
+	}
+
+	public void randomizeValues(String tableName) throws DatasetReaderException, DatasetRandomizerException {
+		reader.setDataset(randomizer.randomizeValues(tableName));
 	}
 
 	public IDataSet getDataSet() {
