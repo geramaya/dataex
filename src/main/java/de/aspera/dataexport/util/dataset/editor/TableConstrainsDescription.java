@@ -17,6 +17,15 @@ public class TableConstrainsDescription {
 	private Map<String, Set<String>> referencedFromTables;
 	private Map<String, String> referencesToTables;
 	private Set<String> randomFields;
+	private Set<String> notNullableColumns;
+
+	public void setNotNullableColumn(Set<String> notNullableColumns) {
+		this.notNullableColumns = notNullableColumns;
+	}
+
+	public List<String> getNotNullableColumns() {
+		return new ArrayList<String>(this.notNullableColumns);
+	}
 
 	public Set<String> getRandomFields() {
 		return randomFields;

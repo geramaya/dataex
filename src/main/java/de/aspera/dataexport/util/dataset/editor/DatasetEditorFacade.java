@@ -92,12 +92,12 @@ public class DatasetEditorFacade {
 		reader.setRandomFields(fields);
 	}
 
-	public void randomizeValues() throws DatasetReaderException, DatasetRandomizerException {
-		reader.setDataset(randomizer.randomizeValues());
+	public void randomizeValues(boolean keepOldData) throws DatasetReaderException, DatasetRandomizerException {
+		reader.setDataset(randomizer.randomizeValues(keepOldData));
 	}
 
-	public void randomizeValues(String tableName) throws DatasetReaderException, DatasetRandomizerException {
-		reader.setDataset(randomizer.randomizeValues(tableName));
+	public void randomizeValues(String tableName,boolean keepOldData) throws DatasetReaderException, DatasetRandomizerException {
+		reader.setDataset(randomizer.randomizeValues(tableName,keepOldData));
 	}
 
 	public IDataSet getDataSet() {

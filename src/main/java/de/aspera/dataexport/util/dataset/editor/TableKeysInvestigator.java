@@ -69,6 +69,7 @@ public class TableKeysInvestigator {
 			tabDescription.setUniqueNumericColTypeMap(getNumericValuesMapForKey("unique", tabName));
 			tabDescription.setReferencedFromTables(getReferencedFromTables(tabName));
 			tabDescription.setReferencesToTables(getReferencesToTables(tabName));
+			tabDescription.setNotNullableColumn(getNotNullableColumns(tabName));
 			// last step
 			keyTypeMap = null;
 			tableConstrians.put(tabName, tabDescription);
@@ -192,6 +193,25 @@ public class TableKeysInvestigator {
 			throw new TableKeysInvestigatorException(e.getMessage(), e);
 		}
 		return colNamesType;
+	}
+
+	private Set<String> getNotNullableColumns(String tableName) throws TableKeysInvestigatorException {
+		Set<String> notNullableCols = new HashSet<String>();
+		ResultSet colNameSet;
+		try {
+			colNameSet = metaData.getColumns(null, null, tableName, null);
+			while (colNameSet.next()) {
+				String colName = colNameSet.getString("COLUMN_NAME");
+				ResultSet column = metaData.getColumns(null, null, tableName, colName);
+				column.next();
+				if (column.getInt("NULLABLE") != DatabaseMetaData.columnNullable) {
+					notNullableCols.add(colName);
+				}
+			}
+		} catch (SQLException e) {
+			throw new TableKeysInvestigatorException(e.getMessage(), e);
+		}
+		return notNullableCols;
 	}
 
 	private Map<String, String> getUniqueColumnNames(String tableName, Set<String> primararyKeysNames)

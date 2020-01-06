@@ -180,4 +180,8 @@ public class DatasetReader {
 		}
 		return new ArrayList<String>(randomFields); 
 	}
+	
+	public boolean isNotNullable(String tableName, String colName) {
+		return tablesConstraints.get(tableName).getNotNullableColumns().contains(colName);
+	}
 }

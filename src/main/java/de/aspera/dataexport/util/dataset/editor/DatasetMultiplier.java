@@ -147,34 +147,41 @@ public class DatasetMultiplier {
 	private void maintainDataIntegrity(DefaultDataSet bigDataset) throws TableKeysInvestigatorException {
 		DefaultTable table = null;
 		DefaultTable referencedTable = null;
+		boolean doRefrence = true;
+		Random random = new Random();
 		for (String tableName : reader.getTableNames()) {
 			Map<String, String> refrences = reader.getReferencesToTables(tableName);
 			for (String colName : refrences.keySet()) {
 				String referencedTableName = refrences.get(colName).split("\\.")[0];
 				String referencedColName = refrences.get(colName).split("\\.")[1];
+				boolean notNullable = reader.isNotNullable(tableName, colName);
 				try {
 					if (reader.getTableNames().contains(referencedTableName)) {
 						table = (DefaultTable) bigDataset.getTable(tableName);
 						referencedTable = (DefaultTable) bigDataset.getTable(referencedTableName);
 						int indexOfRow = reader.getRowCountOfTable(tableName);
 						int rowIndexOfRefTable = reader.getRowCountOfTable(referencedTableName);
-						Random random = new Random();
 						int randomNum = random.nextInt(referencedTable.getRowCount() / 3);
 						List<String> uniques = reader.getUniqueAndPrimaryColNames(tableName);
 						int j = 0;
 						for (int i = indexOfRow; i < table.getRowCount(); i++) {
-							Object referencedValue = referencedTable.getValue(rowIndexOfRefTable, referencedColName);
-							table.setValue(i, colName, referencedValue);
-							if (uniques.contains(colName)) {
-								// 1:1 Relation
-								if (rowIndexOfRefTable < referencedTable.getRowCount())
+							if (!notNullable)
+								doRefrence = random.nextBoolean();
+							if (doRefrence) {
+								Object referencedValue = referencedTable.getValue(rowIndexOfRefTable,
+										referencedColName);
+								table.setValue(i, colName, referencedValue);
+								if (uniques.contains(colName)) {
+									// 1:1 Relation
+									if (rowIndexOfRefTable < referencedTable.getRowCount())
+										rowIndexOfRefTable++;
+									else
+										break;
+								} else if (j == randomNum && rowIndexOfRefTable < referencedTable.getRowCount()) {
+									// 1:N Relation
 									rowIndexOfRefTable++;
-								else
-									break;
-							} else if (j == randomNum && rowIndexOfRefTable < referencedTable.getRowCount()) {
-								// 1:N Relation
-								rowIndexOfRefTable++;
-								j = 0;
+									j = 0;
+								}
 							}
 							j++;
 						}
