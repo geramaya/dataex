@@ -40,8 +40,10 @@ public class DatasetRandomizer {
 							randomTable.setValue(row, colName, reader.getValueInTable(tabName, randomNum, colName));
 					}
 				}
-				if (keepOldData)
-					randomTable = maintainIdsAndRefsOfTable(randomTable,true);
+				if (keepOldData) {
+					randomTable = maintainIdsOfTable(randomTable);
+					randomTable = maintainRefsOfTable(randomTable);
+				}
 				randomDataset.addTable(randomTable);
 			}
 			if (keepOldData)
@@ -75,7 +77,7 @@ public class DatasetRandomizer {
 				}
 			}
 			if(keepOldData)
-				randomTable= maintainIdsAndRefsOfTable(randomTable,false);
+				randomTable= maintainIdsOfTable(randomTable);
 			randomDataset.addTable(randomTable);
 			// copy old tables to the new dataset
 			for (String oldTableName : reader.getTableNames()) {
@@ -89,7 +91,7 @@ public class DatasetRandomizer {
 		return randomDataset;
 	}
 
-	private DefaultTable maintainIdsAndRefsOfTable(DefaultTable newTable, boolean doforeignKeys) throws TableKeysInvestigatorException,
+	private DefaultTable maintainIdsOfTable(DefaultTable newTable) throws TableKeysInvestigatorException,
 			RowOutOfBoundsException, NoSuchColumnException, DataSetException, DatasetReaderException {
 		String tabName = newTable.getTableMetaData().getTableName();
 		List<String> primaryKeyNames = reader.getPrimarykeysOfTable(tabName);
@@ -99,7 +101,11 @@ public class DatasetRandomizer {
 				newTable.setValue(i, priKey, reader.getValidUniqueKeyValue(tabName, priKey));
 			}
 		}
+		return newTable;
+	}
+	private DefaultTable maintainRefsOfTable(DefaultTable newTable) throws DatasetReaderException, RowOutOfBoundsException, NoSuchColumnException, DataSetException {
 		// reset the foreign keys to new Index
+		String tabName = newTable.getTableMetaData().getTableName();
 		Map<String, String> refrences = reader.getReferencesToTables(tabName);
 		for (String colName : refrences.keySet()) {
 			String referencedTableName = refrences.get(colName).split("\\.")[0];
