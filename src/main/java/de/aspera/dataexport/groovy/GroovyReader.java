@@ -7,7 +7,7 @@ import java.nio.file.Paths;
 
 import org.codehaus.groovy.control.CompilationFailedException;
 
-import de.aspera.dataexport.util.dataset.editor.DatasetEditorFacade;
+import de.aspera.dataexport.cmd.DatasetEditorUserFacade;
 import groovy.lang.GroovyClassLoader;
 import groovy.lang.GroovyObject;
 
@@ -39,8 +39,8 @@ public class GroovyReader {
 		return pathOfFile.toFile();
 	}
 
-	public void executeGroovyScript(DatasetEditorFacade facade) {
-		groovyObj.invokeMethod("runScript", facade);
+	public void executeGroovyScript(DatasetEditorUserFacade userFacade) {
+		groovyObj.invokeMethod("runScript", userFacade);
 	}
 
 }

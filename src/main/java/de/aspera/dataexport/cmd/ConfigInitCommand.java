@@ -71,8 +71,8 @@ public class ConfigInitCommand implements CommandRunnable {
 				"setRandomFields(List<String> fields): to define which columns to have random values in the table. They should be defined as follows : 'TableName.ColumnName'",
 				"randomizeValues(): to randomize the values of the defined columns in each table in the Dataset.",
 				"randomizeValues(String tableName): to randomize the values of the defined columns in a specific table" };
-		String clz = "\nimport de.aspera.dataexport.util.dataset.editor.DatasetEditorFacade;\n" + "class Script {\r\n"
-				+ "\r\n" + "     void runScript(DatasetEditorFacade facade) {\n" + "\r}\n}";
+		String clz = "\nimport de.aspera.dataexport.cmd.DatasetEditorUserFacade;\n" + "class Script {\r\n"
+				+ "\r\n" + "     void runScript(DatasetEditorUserFacade facade) {\n" + "\r}\n}";
 
 		String filePath = System.getProperty("user.home") + File.separator + "." + PROJECT_NAME + File.separator
 				+ "GroovyScript.groovy";

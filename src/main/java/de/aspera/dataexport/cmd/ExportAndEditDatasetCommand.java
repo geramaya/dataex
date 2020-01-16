@@ -16,7 +16,6 @@ import org.dbunit.dataset.xml.FlatXmlDataSet;
 
 import de.aspera.dataexport.groovy.GroovyReader;
 import de.aspera.dataexport.util.ExporterController;
-import de.aspera.dataexport.util.dataset.editor.DatasetEditorFacade;
 import de.aspera.dataexport.util.json.ExportJsonCommand;
 import de.aspera.dataexport.util.json.ExportJsonCommandHolder;
 import de.aspera.dataexport.util.json.ImportJsonCommandException;
@@ -31,7 +30,7 @@ public class ExportAndEditDatasetCommand implements CommandRunnable {
 	private JsonConnectionHolder connectionRepo;
 	private ExportJsonCommandHolder commandRepo;
 	private CommandContext cmdContext;
-	private DatasetEditorFacade editorFacade;
+	private DatasetEditorUserFacade userFacade;
 	private ByteArrayOutputStream exportStream;
 	private GroovyReader groovyReader;
 	private File file;
@@ -56,7 +55,6 @@ public class ExportAndEditDatasetCommand implements CommandRunnable {
 			commandRepo = ExportJsonCommandHolder.getInstance();
 			cmdContext = CommandContext.getInstance();
 			commandRepo = ExportJsonCommandHolder.getInstance();
-			editorFacade = new DatasetEditorFacade();
 		} catch (JsonConnectionReadException | FileNotFoundException | ImportJsonCommandException e) {
 			throw new CommandException(e.getMessage(), e);
 		}
@@ -91,15 +89,15 @@ public class ExportAndEditDatasetCommand implements CommandRunnable {
 		try {
 			// convert output to input stream without writing to the desk
 			inputStream = new ByteArrayInputStream(exportStream.toByteArray());
-			editorFacade.readDataset(inputStream);
+			userFacade = new DatasetEditorUserFacade(inputStream);
 			groovyReader = new GroovyReader();
-			editorFacade.setConnectionOfDB(ExporterController.getConnection());
-			groovyReader.executeGroovyScript(editorFacade);
+			userFacade.setConnectionOfDB(ExporterController.getConnection());
+			groovyReader.executeGroovyScript(userFacade);
 			// Write results Back to file
 			file = new File(exportCommand.getExportedFilePath().concat(File.separator + "DataSet-Table-"
 					+ exportCommand.getCommandId() + "-" + dataConnection.getIdent() + ".xml"));
 			fileOut = new FileOutputStream(file);
-			FlatXmlDataSet.write(editorFacade.getDataSet(), fileOut);
+			FlatXmlDataSet.write(userFacade.getDataSet(), fileOut);
 		} catch (Exception e) {
 			throw new CommandException(e.getMessage(), e);
 		} finally {
