@@ -17,7 +17,7 @@ public class GroovyReader {
 	private GroovyObject groovyObj;
 	private static final GroovyClassLoader classLoader = new GroovyClassLoader();
 
-	public GroovyReader() throws GroovyReaderException  {
+	public GroovyReader() throws GroovyReaderException {
 		readGroovyScript();
 	}
 
@@ -27,14 +27,15 @@ public class GroovyReader {
 			Class groovyClass = classLoader.parseClass(script);
 			groovyObj = (GroovyObject) groovyClass.newInstance();
 		} catch (InstantiationException | IllegalAccessException | CompilationFailedException | IOException e) {
-			throw  new GroovyReaderException(e.getMessage(), e);
+			throw new GroovyReaderException(e.getMessage(), e);
 		}
 
 	}
 
 	private File getGroovyScriptFile() {
 		String filePath;
-		filePath = System.getProperty("user.home") + File.separator+"." + PROJECT_NAME + File.separator+"GroovyScript.groovy";
+		filePath = System.getProperty("user.home") + File.separator + "." + PROJECT_NAME + File.separator
+				+ "GroovyScript.groovy";
 		Path pathOfFile = Paths.get(filePath);
 		return pathOfFile.toFile();
 	}

@@ -18,6 +18,7 @@ public class TableConstrainsDescription {
 	private Map<String, String> referencesToTables;
 	private Set<String> randomFields;
 	private Set<String> notNullableColumns;
+	private static final DataFaker faker = new DataFaker();
 
 	public void setNotNullableColumn(Set<String> notNullableColumns) {
 		this.notNullableColumns = notNullableColumns;
@@ -34,8 +35,6 @@ public class TableConstrainsDescription {
 	public void setRandomFields(Set<String> randomFields) {
 		this.randomFields = randomFields;
 	}
-
-	private static final DataFaker faker = new DataFaker();
 
 	public void setUniqueNumericColTypeMap(Map<String, Integer> numericUniqueColValueMap) {
 		this.numericUniqueColValueMap = numericUniqueColValueMap;

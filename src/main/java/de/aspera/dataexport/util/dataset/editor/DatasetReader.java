@@ -34,6 +34,18 @@ public class DatasetReader {
 	public List<String> getTableNames() {
 		return new ArrayList<String>(tablesMap.keySet());
 	}
+	
+	public List<ITable> getTables() throws DataSetException{
+		List<ITable> tables = new ArrayList<ITable>();
+		for(String tabName : getTableNames()) {
+			tables.add(getTable(tabName));
+		}
+		return tables;
+	}
+	
+	public ITable getTable(String tabName) throws DataSetException {
+		return dataset.getTable(tabName);
+	}
 
 	public int getRowCountOfTable(String tableName) {
 		return this.tablesMap.get(tableName).getRowCount();

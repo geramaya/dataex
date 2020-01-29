@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.dbunit.dataset.DataSetException;
+import org.dbunit.dataset.DefaultDataSet;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.xml.XmlDataSet;
 
@@ -15,12 +16,14 @@ public class DatasetEditorFacade {
 	private DatasetRowEditor rowEditor;
 	private TableKeysInvestigator tableInvestigator;
 	private DatasetRandomizer randomizer;
+	private RefrencesEditor refEditor;
 
 	public DatasetEditorFacade() {
 		this.reader = new DatasetReader();
 		this.multiplier = new DatasetMultiplier(reader);
 		this.rowEditor = new DatasetRowEditor(reader);
 		this.randomizer = new DatasetRandomizer(reader);
+		this.refEditor = new RefrencesEditor(reader);
 		this.tableInvestigator = new TableKeysInvestigator();
 	}
 
@@ -36,6 +39,10 @@ public class DatasetEditorFacade {
 		} catch (DataSetException e) {
 			throw new DatasetEditorException(e.getMessage(), e);
 		}
+	}
+	
+	public void readDataset(IDataSet dataset) throws DatasetReaderException {
+		reader.setDataset(dataset);
 	}
 
 	public List<String> getTableNames() {
@@ -60,7 +67,8 @@ public class DatasetEditorFacade {
 
 	public void multiplyData(int factor)
 			throws TableKeysInvestigatorException, DatasetReaderException, DatasetMultiplierException {
-		reader.setDataset(multiplier.multiplyData(factor));
+		DefaultDataSet datset = multiplier.multiplyData(factor);
+		reader.setDataset(refEditor.maintainDataIntegrity(datset));
 	}
 
 	public void multiplyRowInTable(String tableName, int row, int factor)
@@ -70,7 +78,8 @@ public class DatasetEditorFacade {
 
 	public void multiplyDataInTable(String tableName, int factor)
 			throws TableKeysInvestigatorException, DatasetReaderException, DatasetMultiplierException {
-		reader.setDataset(multiplier.multiplyDataInTable(tableName, factor));
+		DefaultDataSet datset =multiplier.multiplyDataInTable(tableName, factor);
+		reader.setDataset(refEditor.maintainDataIntegrity(datset));
 	}
 
 	public void changeValuesInRow(String tableName, int row, Map<String, String> newValuesColName)
@@ -102,6 +111,11 @@ public class DatasetEditorFacade {
 
 	public IDataSet getDataSet() {
 		return reader.getDataSet();
+	}
+
+	public IDataSet editForNewImport() throws DataSetException, TableKeysInvestigatorException {
+		return refEditor.editForNewImport();
+		
 	}
 
 }

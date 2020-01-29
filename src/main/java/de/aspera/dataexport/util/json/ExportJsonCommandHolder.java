@@ -29,7 +29,8 @@ public final class ExportJsonCommandHolder {
 	private Gson gson = new Gson();
 	private JsonReader jsonReader;
 
-	private ExportJsonCommandHolder() {}
+	private ExportJsonCommandHolder() {
+	}
 
 	public static ExportJsonCommandHolder getInstance() {
 		if (instance == null) {
@@ -67,8 +68,8 @@ public final class ExportJsonCommandHolder {
 			} else if (cmd.getConnId().isEmpty()) {
 				throw new ImportJsonCommandException("Connection Id is empty");
 			} else {
-				for(TableQuery table : cmd.getTables()) {
-					if(table.getTableName().isEmpty())
+				for (TableQuery table : cmd.getTables()) {
+					if (table.getTableName().isEmpty())
 						throw new ImportJsonCommandException("Table name is empty");
 				}
 				cmdRepo.put(commId, cmd);
@@ -95,7 +96,7 @@ public final class ExportJsonCommandHolder {
 
 	public void deleteCommands() {
 		cmdRepo.clear();
-		
+
 	}
 
 }

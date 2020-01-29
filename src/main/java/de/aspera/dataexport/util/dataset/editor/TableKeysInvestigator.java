@@ -75,7 +75,6 @@ public class TableKeysInvestigator {
 			tableConstrians.put(tabName, tabDescription);
 		}
 		return tableConstrians;
-
 	}
 
 	private Map<String, String> getReferencesToTables(String tabName) throws TableKeysInvestigatorException {
@@ -254,9 +253,6 @@ public class TableKeysInvestigator {
 					mapIntegerValues.put(keyName, getMaxNumberValueInColFromDB(tableName, keyName));
 				}
 			}
-		} else {
-			// Foreign Key
-
 		}
 		return mapIntegerValues;
 	}
@@ -281,9 +277,6 @@ public class TableKeysInvestigator {
 					mapCharValues.put(keyName, getAllCharValuesInColumnFromDB(tableName, keyName));
 				}
 			}
-		} else {
-			// Foreign Key
-
 		}
 		return mapCharValues;
 	}
