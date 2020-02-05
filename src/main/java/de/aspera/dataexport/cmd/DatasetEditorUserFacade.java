@@ -1,6 +1,7 @@
 package de.aspera.dataexport.cmd;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.sql.Connection;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +20,7 @@ public class DatasetEditorUserFacade {
 	private static DatasetEditorFacade facade;
 
 	public DatasetEditorUserFacade(ByteArrayInputStream inputStream)
-			throws DatasetEditorException, DatasetReaderException {
+			throws DatasetEditorException, DatasetReaderException, IOException {
 		facade = new DatasetEditorFacade();
 		facade.readDataset(inputStream);
 	}

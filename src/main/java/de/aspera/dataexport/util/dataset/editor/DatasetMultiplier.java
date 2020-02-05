@@ -24,20 +24,16 @@ public class DatasetMultiplier {
 				bigTable.addTableRows(reader.getTable(tabName));
 				uniqesOfTable = reader.getUniqueAndPrimaryColNames(tabName);
 				for (int y = 0; y < factor; y++) {
-					for (int i = 0; i < reader.getRowCountOfTable(tabName); i++) {
-						List<String> colNames = reader.getColumnNamesOfTable(tabName);
-						Object[] valuesOfRow = new Object[colNames.size()];
-						int j = 0;
-						for (String colName : colNames) {
-							if (uniqesOfTable != null && uniqesOfTable.contains(colName)) {
-								valuesOfRow[j] = reader.getValidUniqueKeyValue(tabName, colName);
-							} else {
-								valuesOfRow[j] = reader.getValueInTable(tabName, i, colName);
+					DefaultTable copyTable = new DefaultTable(reader.getMetaDataOfTable(tabName));
+					copyTable.addTableRows(reader.getTable(tabName));
+					if (uniqesOfTable != null) {
+						for (String uniqeCol : uniqesOfTable) {
+							for (int i = 0; i < copyTable.getRowCount(); i++) {
+								copyTable.setValue(i, uniqeCol, reader.getValidUniqueKeyValue(tabName, uniqeCol));
 							}
-							j++;
 						}
-						bigTable.addRow(valuesOfRow);
 					}
+					bigTable.addTableRows(copyTable);
 				}
 				bigDataset.addTable(bigTable);
 			}
@@ -92,20 +88,16 @@ public class DatasetMultiplier {
 			bigTable.addTableRows(reader.getTable(tableName));
 			uniqesOfTable = reader.getUniqueAndPrimaryColNames(tableName);
 			for (int y = 0; y < factor; y++) {
-				for (int i = 0; i < reader.getRowCountOfTable(tableName); i++) {
-					List<String> colNames = reader.getColumnNamesOfTable(tableName);
-					Object[] valuesOfRow = new Object[colNames.size()];
-					int j = 0;
-					for (String colName : colNames) {
-						if (uniqesOfTable != null && uniqesOfTable.contains(colName)) {
-							valuesOfRow[j] = reader.getValidUniqueKeyValue(tableName, colName);
-						} else {
-							valuesOfRow[j] = reader.getValueInTable(tableName, i, colName);
+				DefaultTable copyTable = new DefaultTable(reader.getMetaDataOfTable(tableName));
+				copyTable.addTableRows(reader.getTable(tableName));
+				if (uniqesOfTable != null) {
+					for (String uniqeCol : uniqesOfTable) {
+						for (int i = 0; i < copyTable.getRowCount(); i++) {
+							copyTable.setValue(i, uniqeCol, reader.getValidUniqueKeyValue(tableName, uniqeCol));
 						}
-						j++;
 					}
-					bigTable.addRow(valuesOfRow);
 				}
+				bigTable.addTableRows(copyTable);
 			}
 			bigDataset.addTable(bigTable);
 			// copy other tables into the new dataset
@@ -120,7 +112,5 @@ public class DatasetMultiplier {
 		}
 		return bigDataset;
 	}
-
-	
 
 }

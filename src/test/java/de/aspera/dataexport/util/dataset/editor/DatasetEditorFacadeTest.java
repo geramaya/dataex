@@ -54,6 +54,7 @@ public class DatasetEditorFacadeTest {
 		File file = tempFolder.newFile("testDataSet.xml");
 		FileOutputStream out = new FileOutputStream(file);
 		FlatXmlDataSet.write(dataset, out);
+		out.close();
 		FileInputStream in = new FileInputStream(file);
 		editorFacade.readDataset(in);
 		assertEquals(1, editorFacade.getTableNames().size(), "tables of the dataset were not correctly read from stream");

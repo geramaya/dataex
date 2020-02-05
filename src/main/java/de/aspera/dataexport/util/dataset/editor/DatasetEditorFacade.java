@@ -1,5 +1,6 @@
 package de.aspera.dataexport.util.dataset.editor;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.util.List;
@@ -8,7 +9,7 @@ import java.util.Map;
 import org.dbunit.dataset.DataSetException;
 import org.dbunit.dataset.DefaultDataSet;
 import org.dbunit.dataset.IDataSet;
-import org.dbunit.dataset.xml.XmlDataSet;
+import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
 
 public class DatasetEditorFacade {
 	private DatasetReader reader;
@@ -31,10 +32,10 @@ public class DatasetEditorFacade {
 		reader.readDataset(filePath);
 	}
 
-	public void readDataset(InputStream stream) throws DatasetEditorException, DatasetReaderException {
+	public void readDataset(InputStream stream) throws DatasetEditorException, DatasetReaderException, IOException {
 		IDataSet dataset;
 		try {
-			dataset = new XmlDataSet(stream);
+			dataset = new FlatXmlDataSetBuilder().build(stream);
 			reader.setDataset(dataset);
 		} catch (DataSetException e) {
 			throw new DatasetEditorException(e.getMessage(), e);

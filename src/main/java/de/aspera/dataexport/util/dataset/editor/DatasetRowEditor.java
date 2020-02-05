@@ -26,9 +26,8 @@ public class DatasetRowEditor {
 			throws TableKeysInvestigatorException, DatasetRowEditorException, DatasetReaderException {
 		DefaultTable table = new DefaultTable(reader.getMetaDataOfTable(tableName));
 		DefaultDataSet editedDataSet = null;
-		List<String> uniqueCols = null;
+		List<String> uniqueCols = reader.getUniqueAndPrimaryColNames(tableName);
 		Map<String, String> colNameValueMap = reader.getRowOfTable(tableName, row);
-		uniqueCols = reader.getUniqueAndPrimaryColNames(tableName);
 		for (String colName : newValuesColName.keySet()) {
 			// don't exchange values of the Unique keys
 			if (uniqueCols != null) {
@@ -45,12 +44,7 @@ public class DatasetRowEditor {
 		}
 		try {
 			// Copy Old table
-			for (int oldrow = 0; oldrow < reader.getRowCountOfTable(tableName); oldrow++) {
-				table.addRow();
-				for (String colName : reader.getColumnNamesOfTable(tableName)) {
-					table.setValue(oldrow, colName, reader.getValueInTable(tableName, oldrow, colName));
-				}
-			}
+			table.addTableRows(reader.getTable(tableName));
 			for (String colName : colNameValueMap.keySet()) {
 				table.setValue(row, colName, colNameValueMap.get(colName));
 			}
@@ -94,12 +88,7 @@ public class DatasetRowEditor {
 			}
 
 			// Copy Old table
-			for (int row = 0; row < reader.getRowCountOfTable(tableName); row++) {
-				table.addRow();
-				for (String colName : reader.getColumnNamesOfTable(tableName)) {
-					table.setValue(row, colName, reader.getValueInTable(tableName, row, colName));
-				}
-			}
+			table.addTableRows(reader.getTable(tableName));
 			// add new Row at the end
 			int indexOfLastRow = table.getRowCount();
 			table.addRow();

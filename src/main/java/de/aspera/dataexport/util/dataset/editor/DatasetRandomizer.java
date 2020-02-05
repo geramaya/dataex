@@ -42,8 +42,9 @@ public class DatasetRandomizer {
 				randomDataset.addTable(randomTable);
 			}
 			if (keepOldData)
-				return new CompositeDataSet( reader.getDataSet(),randomDataset);
-			return randomDataset;
+				return new CompositeDataSet(reader.getDataSet(), randomDataset);
+			else
+				return randomDataset;
 		} catch (DatasetReaderException | TableKeysInvestigatorException | DataSetException e) {
 			throw new DatasetRandomizerException(e.getMessage(), e);
 		}
@@ -66,8 +67,11 @@ public class DatasetRandomizer {
 					randomTable.setValue(row, colName, ahmed);
 				}
 			}
-			if(keepOldData)
-				randomTable= maintainIdsOfTable(randomTable);
+			if (keepOldData) {
+				randomTable = maintainIdsOfTable(randomTable);
+				randomTable.addTableRows(reader.getTable(tableName));
+			}
+				
 			randomDataset.addTable(randomTable);
 			// copy old tables to the new dataset
 			for (String oldTableName : reader.getTableNames()) {
@@ -93,17 +97,19 @@ public class DatasetRandomizer {
 		}
 		return newTable;
 	}
-	private DefaultTable maintainRefsOfTable(DefaultTable newTable) throws DatasetReaderException, RowOutOfBoundsException, NoSuchColumnException, DataSetException {
+
+	private DefaultTable maintainRefsOfTable(DefaultTable newTable)
+			throws DatasetReaderException, RowOutOfBoundsException, NoSuchColumnException, DataSetException {
 		// reset the foreign keys to new Index
 		String tabName = newTable.getTableMetaData().getTableName();
 		Map<String, String> refrences = reader.getReferencesToTables(tabName);
 		for (String colName : refrences.keySet()) {
 			String referencedTableName = refrences.get(colName).split("\\.")[0];
-			if(reader.getTableNames().contains(referencedTableName)) {
+			if (reader.getTableNames().contains(referencedTableName)) {
 				int maxNumber = reader.getRowCountOfTable(referencedTableName);
 				for (int i = 0; i < newTable.getRowCount(); i++) {
-					Object oldValue = reader.getValueInTable(tabName, i, colName) ;
-					if(oldValue!=null) {
+					Object oldValue = reader.getValueInTable(tabName, i, colName);
+					if (oldValue != null) {
 						int value = Integer.parseInt(oldValue.toString());
 						newTable.setValue(i, colName, value + maxNumber);
 					}
