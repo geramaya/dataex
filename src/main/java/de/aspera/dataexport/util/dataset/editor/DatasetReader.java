@@ -34,15 +34,15 @@ public class DatasetReader {
 	public List<String> getTableNames() {
 		return new ArrayList<String>(tablesMap.keySet());
 	}
-	
-	public List<ITable> getTables() throws DataSetException{
+
+	public List<ITable> getTables() throws DataSetException {
 		List<ITable> tables = new ArrayList<ITable>();
-		for(String tabName : getTableNames()) {
+		for (String tabName : getTableNames()) {
 			tables.add(getTable(tabName));
 		}
 		return tables;
 	}
-	
+
 	public ITable getTable(String tabName) throws DataSetException {
 		return dataset.getTable(tabName);
 	}
@@ -169,14 +169,14 @@ public class DatasetReader {
 	}
 
 	public void setRandomFields(List<String> fields) {
-		for(String str : fields) {
+		for (String str : fields) {
 			String tabName = str.split("\\.")[0];
 			String fieldName = str.split("\\.")[1];
-			TableConstrainsDescription tabCons= tablesConstraints.get(tabName);
-			if(tabCons!=null) {
-				if(tabCons.getRandomFields()!=null) {
+			TableConstrainsDescription tabCons = tablesConstraints.get(tabName);
+			if (tabCons != null) {
+				if (tabCons.getRandomFields() != null) {
 					tabCons.getRandomFields().add(fieldName);
-				}else {
+				} else {
 					Set<String> fieldSet = new HashSet<String>();
 					fieldSet.add(fieldName);
 					tabCons.setRandomFields(fieldSet);
@@ -184,16 +184,24 @@ public class DatasetReader {
 			}
 		}
 	}
-	
-	public List<String> getRandomFields(String tableName) throws DatasetReaderException{
+
+	public List<String> getRandomFields(String tableName) throws DatasetReaderException {
 		Set<String> randomFields = tablesConstraints.get(tableName).getRandomFields();
-		if(randomFields==null) {
-			throw new DatasetReaderException("Random fields are not defined for table: "+tableName);
+		if (randomFields == null) {
+			throw new DatasetReaderException("Random fields are not defined for table: " + tableName);
 		}
-		return new ArrayList<String>(randomFields); 
+		return new ArrayList<String>(randomFields);
 	}
-	
+
 	public boolean isNotNullable(String tableName, String colName) {
 		return tablesConstraints.get(tableName).getNotNullableColumns().contains(colName);
+	}
+	
+	public void addTableDescriptionContriant (String tableName, TableConstrainsDescription tabDesc) {
+		if (tablesConstraints ==null) {
+			tablesConstraints= new HashMap<String, TableConstrainsDescription>();
+		}
+		tablesConstraints.put(tableName, tabDesc);
+		
 	}
 }

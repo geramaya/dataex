@@ -31,8 +31,10 @@ public class DatasetRandomizer {
 				for (String colName : reader.getRandomFields(tabName)) {
 					for (int row = 0; row < reader.getRowCountOfTable(tabName); row++) {
 						int randomNum = random.nextInt(reader.getRowCountOfTable(tabName));
-						if (!uniques.contains(colName))
-							randomTable.setValue(row, colName, reader.getValueInTable(tabName, randomNum, colName));
+						if (uniques != null) {
+							if (!uniques.contains(colName))
+								randomTable.setValue(row, colName, reader.getValueInTable(tabName, randomNum, colName));
+						}
 					}
 				}
 				if (keepOldData) {
@@ -58,20 +60,22 @@ public class DatasetRandomizer {
 			List<String> uniques = reader.getUniqueAndPrimaryColNames(tableName);
 			// Copy Old table
 			randomTable.addTableRows(reader.getTable(tableName));
-			Object ahmed = null;
+			Object obj = null;
 			for (String colName : reader.getRandomFields(tableName)) {
 				for (int row = 0; row < reader.getRowCountOfTable(tableName); row++) {
 					int randomNum = random.nextInt(reader.getRowCountOfTable(tableName));
-					if (!uniques.contains(colName))
-						ahmed = reader.getValueInTable(tableName, randomNum, colName);
-					randomTable.setValue(row, colName, ahmed);
+					if(uniques!=null) {
+						if (!uniques.contains(colName))
+							obj = reader.getValueInTable(tableName, randomNum, colName);
+					}
+					randomTable.setValue(row, colName, obj);
 				}
 			}
 			if (keepOldData) {
 				randomTable = maintainIdsOfTable(randomTable);
 				randomTable.addTableRows(reader.getTable(tableName));
 			}
-				
+
 			randomDataset.addTable(randomTable);
 			// copy old tables to the new dataset
 			for (String oldTableName : reader.getTableNames()) {
