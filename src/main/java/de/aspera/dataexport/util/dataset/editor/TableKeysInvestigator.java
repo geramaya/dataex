@@ -77,7 +77,7 @@ public class TableKeysInvestigator {
 		return tableConstrians;
 	}
 
-	private Map<String, String> getReferencesToTables(String tabName) throws TableKeysInvestigatorException {
+	public Map<String, String> getReferencesToTables(String tabName) throws TableKeysInvestigatorException {
 		Map<String, String> referencesToTabCol = new HashMap<String, String>();
 		try {
 			ResultSet set = metaData.getImportedKeys(null, null, tabName);
