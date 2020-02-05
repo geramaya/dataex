@@ -118,7 +118,7 @@ public class TableKeysInvestigator {
 		return referencedFromTabCol;
 	}
 
-	private Map<String, String> getPrimarykeysOfTable(String tableName) throws TableKeysInvestigatorException {
+	public Map<String, String> getPrimarykeysOfTable(String tableName) throws TableKeysInvestigatorException {
 		if (keyTypeMap == null || keyTypeMap.isEmpty())
 			keyTypeMap = new HashMap<String, String>();
 		ResultSet keySet;
@@ -233,7 +233,7 @@ public class TableKeysInvestigator {
 		return uniqueColNameTypeMap;
 	}
 
-	private Map<String, Integer> getNumericValuesMapForKey(String keyType, String tableName)
+	public Map<String, Integer> getNumericValuesMapForKey(String keyType, String tableName)
 			throws TableKeysInvestigatorException {
 		Map<String, Integer> mapIntegerValues = new HashMap<String, Integer>();
 		if (keyType.equals("primaryKey")) {
